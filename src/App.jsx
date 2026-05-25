@@ -2283,7 +2283,7 @@ const InteractiveDemographicMap = memo(() => {
                 <div onClick={() => setIsPanelOpen(true)} className="absolute top-4 left-4 z-[1000] bg-white/90 backdrop-blur-md p-2.5 rounded-xl shadow-md border border-[#D8D8D8] cursor-pointer hover:bg-white text-[#1E2F31] font-bold text-xs uppercase flex items-center gap-2"><Map size={16} className="text-[#1C6048]"/> Open Map Data</div>
             )}
 
-            <div onClick={() => setIsMeasuring(!isMeasuring)} className={`absolute bottom-4 left-[64px] z-[1000] w-[34px] h-[34px] bg-white rounded flex justify-center items-center cursor-pointer shadow-[0_1px_5px_rgba(0,0,0,0.65)] border-2 border-black/20 bg-clip-padding transition-all hover:bg-[#f4f4f4] ${isMeasuring ? 'text-[#1C6048] bg-[#E8EFEA]' : 'text-[#4C4A4B]'}`} title="Measure Distance"><Ruler size={16} strokeWidth={2.5} /></div>
+            <div onClick={() => setIsMeasuring(!isMeasuring)} className={`absolute bottom-4 left-[64px] z-[1000] w-[34px] h-[34px] rounded flex justify-center items-center cursor-pointer shadow-[0_1px_5px_rgba(0,0,0,0.65)] border-2 border-black/20 bg-clip-padding transition-all ${isMeasuring ? 'bg-[#f4f4f4] text-[#1C6048]' : 'bg-white text-[#4C4A4B] hover:bg-[#f4f4f4] hover:text-[#1C6048]'}`} title="Measure Distance"><Ruler size={16} strokeWidth={2.5} /></div>
         </div>
     );
 });
