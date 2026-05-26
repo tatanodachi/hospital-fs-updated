@@ -1874,12 +1874,18 @@ const InteractiveDemographicMap = memo(() => {
             return;
         }
 
+        // FIX: Instantly lock ALL missing regions as 'loading' to prevent duplicate background loops
+        setRegionFetchStatuses(prev => {
+            const next = { ...prev };
+            missingIds.forEach(id => next[id] = 'loading');
+            return next;
+        });
+
         for (const id of missingIds) {
             const region = targetRegions.find(r => r.id === id);
             if (!region) continue;
 
             setLoadingStatus({ active: true, text: `Loading boundary: ${region.name}`, isError: false });
-            setRegionFetchStatuses(prev => ({ ...prev, [id]: 'loading' }));
             
             let success = false;
             let retries = 2;
