@@ -1672,44 +1672,46 @@ const mapLocations = [
     { id: "vasanta", name: "Proposed Vasanta Hospital", group: "Vasanta", desc: "120-Bed Oncology Hub", lat: -6.1543, lon: 106.7398, color: "#1C6048", radii: [5000, 10000] },
     
     // Vasanta: < 5km Radius (Class B)
-        { id: "v_rsgk", name: "RS EMC Grha Kedoya", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1681, lon: 106.7651, color: "#A95C3E" },
+    { id: "v_rsgk", name: "RS EMC Grha Kedoya", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1681, lon: 106.7651, color: "#A95C3E" },
     { id: "v_hermina_dm", name: "Hermina Daan Mogot", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1554, lon: 106.7082, color: "#A95C3E" },
     { id: "v_rspi_puri", name: "RS Pondok Indah Puri Indah", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1866, lon: 106.7358, color: "#A95C3E" },
+    { id: "v_pik", name: "Pantai Indah Kapuk Hospital", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1112, lon: 106.7404, color: "#A95C3E" },
+    { id: "v_ciputra", name: "Ciputra Hospital CitraGarden", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1265, lon: 106.7055, color: "#A95C3E" },
     { id: "v_siloam_kj", name: "Siloam Kebon Jeruk", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1912, lon: 106.7621, color: "#A95C3E" },
     { id: "v_rsud_cengkareng", name: "RSUD Cengkareng", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Public (B)", lat: -6.1362, lon: 106.7298, color: "#A95C3E" },
 
     // Vasanta: 5-10km Radius (Class A)
-    { id: "v_mandaya", name: "Mandaya Royal Puri", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1985, lon: 106.7045, color: "#A95C3E" },
-    { id: "v_tarakan", name: "RSUD Tarakan", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Public (A)", lat: -6.1732, lon: 106.8090, color: "#A95C3E" },
-    { id: "v_dharmais", name: "Dharmais Cancer Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "National Cancer Center (Public)", lat: -6.1953, lon: 106.7990, color: "#A95C3E" },
-    { id: "v_rsab", name: "RSAB Harapan Kita", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Maternal & Child (Public)", lat: -6.1955, lon: 106.7981, color: "#A95C3E" },
-    { id: "v_rsjpn", name: "RSJPN Harapan Kita", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Cardiac Center (Public)", lat: -6.1942, lon: 106.7985, color: "#A95C3E" },
-    { id: "v_rsj_soeharto", name: "RSJ Dr. Soeharto Heerdjan", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Mental Health (Public)", lat: -6.1625, lon: 106.7860, color: "#A95C3E" },
-    { id: "v_fkg_trisakti", name: "RSGM FKG Trisakti", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Dental Center", lat: -6.1685, lon: 106.7885, color: "#A95C3E" },
+    { id: "v_tarakan", name: "RSUD Tarakan", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Public (A)", lat: -6.1732, lon: 106.8090, color: "#1E2F31" },
+    { id: "v_dharmais", name: "Dharmais Cancer Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "National Cancer Center (Public)", lat: -6.1953, lon: 106.7990, color: "#1E2F31" },
+    { id: "v_rsab", name: "RSAB Harapan Kita", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Maternal & Child (Public)", lat: -6.1955, lon: 106.7981, color: "#1E2F31" },
+    { id: "v_rsjpn", name: "RSJPN Harapan Kita", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Cardiac Center (Public)", lat: -6.1942, lon: 106.7985, color: "#1E2F31" },
+    { id: "v_rsj_soeharto", name: "RSJ Dr. Soeharto Heerdjan", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Mental Health (Public)", lat: -6.1625, lon: 106.7860, color: "#1E2F31" },
+    { id: "v_fkg_trisakti", name: "RSGM FKG Trisakti", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Dental Center", lat: -6.1685, lon: 106.7885, color: "#1E2F31" },
 
     // Vasanta: 5-10km Radius (Class B)
+    { id: "v_mandaya", name: "Mandaya Royal Puri", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1985, lon: 106.7045, color: "#A95C3E" },
     { id: "v_tzuchi", name: "Tzu Chi Hospital - PIK", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1060, lon: 106.7392, color: "#A95C3E" },
-    { id: "v_pik", name: "Pantai Indah Kapuk Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1112, lon: 106.7404, color: "#A95C3E" },
+    
     { id: "v_husada", name: "RS Husada", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1415, lon: 106.8251, color: "#A95C3E" },
     { id: "v_ladokgi", name: "RSGM Ladokgi", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Dental (Public)", lat: -6.2111, lon: 106.8075, color: "#A95C3E" },
     { id: "v_mintohardjo", name: "RSAL Dr. Mintohardjo", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Naval Hospital (Public)", lat: -6.2085, lon: 106.8078, color: "#A95C3E" },
     { id: "v_atma_jaya", name: "RS Atma Jaya", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1135, lon: 106.7885, color: "#A95C3E" },
     { id: "v_pluit", name: "Pluit Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1182, lon: 106.7931, color: "#A95C3E" },
     { id: "v_pelni", name: "RS Pelni", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Public (B)", lat: -6.1925, lon: 106.8001, color: "#A95C3E" },
-    { id: "v_ciputra", name: "Ciputra Hospital CitraGarden", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1265, lon: 106.7055, color: "#A95C3E" },
+    
     { id: "v_sumber_waras", name: "Sumber Waras Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1652, lon: 106.7971, color: "#A95C3E" },
     { id: "v_royal_taruma", name: "Royal Taruma Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1645, lon: 106.7871, color: "#A95C3E" },
 
     // --- CANCER HOSPITALS (Static/Standalone Group) ---
     // Class A
-    { id: "dharmais", name: "Dharmais Cancer Hospital", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.1953, lon: 106.7990, color: "#A95C3E" },
-    { id: "mrccc", name: "MRCCC Siloam Semanggi", group: "Cancer Hospitals", subGroup: "Class A", desc: "Private Comprehensive Cancer Center", lat: -6.2201, lon: 106.8155, color: "#A95C3E" },
-    { id: "rscm", name: "RSUPN Cipto Mangunkusumo", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.1976, lon: 106.8470, color: "#A95C3E" },
+    { id: "dharmais", name: "Dharmais Cancer Hospital", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.1953, lon: 106.7990, color: "#99B6AA" },
+    { id: "mrccc", name: "MRCCC Siloam Semanggi", group: "Cancer Hospitals", subGroup: "Class A", desc: "Private Comprehensive Cancer Center", lat: -6.2201, lon: 106.8155, color: "#99B6AA" },
+    { id: "rscm", name: "RSUPN Cipto Mangunkusumo", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.1976, lon: 106.8470, color: "#99B6AA" },
     
     // Class B
-    { id: "tzuchi", name: "Tzu Chi Hospital - PIK", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat:  -6.1060, lon: 106.7392, color: "#A95C3E" },
-    { id: "mandaya", name: "Mandaya Royal Puri", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.1985, lon: 106.7045, color: "#A95C3E" },
-    { id: "rsgk", name: "RS EMC Grha Kedoya", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.1681, lon: 106.7651, color: "#A95C3E" },
+    { id: "tzuchi", name: "Tzu Chi Hospital - PIK", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat:  -6.1060, lon: 106.7392, color: "#99B6AA" },
+    { id: "mandaya", name: "Mandaya Royal Puri", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.1985, lon: 106.7045, color: "#99B6AA" },
+    { id: "rsgk", name: "RS EMC Grha Kedoya", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.1681, lon: 106.7651, color: "#99B6AA" },
 
     // --- GENERAL NODES ---
     { id: "tb", name: "TB Simatupang", group: "General", desc: "South Jakarta competitor node", lat: -6.2932, lon: 106.8189, color: "#9B8B70" },
@@ -1760,7 +1762,7 @@ const InteractiveDemographicMap = memo(() => {
     const [poiSectionExpanded, setPoiSectionExpanded] = useState(true);
     const [expandedGroups, setExpandedGroups] = useState({});
     const [expandedPoiGroups, setExpandedPoiGroups] = useState({ 'Vasanta': true, 'Cancer Hospitals': false, 'General': false });
-    const [expandedSubGroups, setExpandedSubGroups] = useState({ 'Class A': true, '< 5km Radius': true, '5-10km Radius': false });
+    const [expandedSubGroups, setExpandedSubGroups] = useState({ 'Class A': false, '< 5km Radius': false, '5-10km Radius': false });
     const [activeRegions, setActiveRegions] = useState(targetRegions.filter(r => !r.defaultOff).map(r => r.id));
     const [showRegionLabels, setShowRegionLabels] = useState(false);
     const [activePOIs, setActivePOIs] = useState(mapLocations.map(l => l.id));
@@ -1805,6 +1807,7 @@ const InteractiveDemographicMap = memo(() => {
         const map = L.map('demographics-map', { zoomControl: false }).setView([-6.1543, 106.7398], 11);
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
+        map.createPane('labelsPane'); map.getPane('labelsPane').style.zIndex = 405;
         map.createPane('ringsPane'); map.getPane('ringsPane').style.zIndex = 410;
         map.createPane('markersPane'); map.getPane('markersPane').style.zIndex = 420;
 
@@ -1832,7 +1835,7 @@ const InteractiveDemographicMap = memo(() => {
         // 1. Permanently bind the static text to the center of the region
         layer.bindTooltip(
             `<div class="static-region-name">${region.name}</div>`, 
-            { permanent: true, direction: 'center', className: 'static-region-tooltip', interactive: false }
+            { permanent: true, direction: 'center', className: 'static-region-tooltip', interactive: false, pane: 'labelsPane' }
         );
 
         // 2. Simple hover effect (just highlights the border/fill, no tooltips!)
@@ -2191,14 +2194,25 @@ const InteractiveDemographicMap = memo(() => {
                     box-shadow: inset 0 0 200px rgba(30, 47, 49, 0.35);
                     pointer-events: none; z-index: 10;
                 }
+                /* Fix the ugly square focus ring on map markers */
+                .leaflet-interactive:focus { outline: none !important; }
+                
+                /* Ultra-Premium Glassmorphism Tooltips */
                 .leaflet-tooltip.custom-tooltip, .leaflet-popup-content-wrapper {
-                    background-color: rgba(239, 235, 231, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-                    border-radius: 8px; box-shadow: 0 10px 30px rgba(30, 47, 49, 0.15);
-                    border: 1px solid rgba(155, 139, 112, 0.2); color: #1E2f31;
-                    font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+                    background: rgba(255, 255, 255, 0.5) !important; 
+                    backdrop-filter: blur(16px) saturate(180%) !important; 
+                    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+                    border-radius: 12px !important; 
+                    box-shadow: 0 8px 32px rgba(30, 47, 49, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.6) !important;
+                    border: none !important; 
+                    color: #1E2F31 !important;
+                    font-weight: 600 !important; 
+                    font-family: 'Plus Jakarta Sans', sans-serif !important;
                 }
-                .leaflet-tooltip.custom-tooltip { padding: 10px 14px; opacity: 1 !important; }
-                .leaflet-popup-content { margin: 10px 14px; line-height: 1.4; }
+                /* Hide the little map arrows so the glass box floats cleanly */
+                .leaflet-tooltip-tip, .leaflet-popup-tip-container { display: none !important; }
+                .leaflet-tooltip.custom-tooltip { padding: 12px 16px; opacity: 1 !important; }
+                .leaflet-popup-content { margin: 12px 16px; line-height: 1.4; }
                 
                 /* Custom Scrollbar */
                 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -2264,17 +2278,16 @@ const InteractiveDemographicMap = memo(() => {
             </div>
 
             <div className={`absolute top-4 left-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[320px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-all ${isPanelOpen ? 'translate-x-0' : '-translate-x-[120%]'}`}>
-                <div className="p-4 border-b border-[#D8D8D8] flex justify-between items-center sticky top-0 bg-white/95 z-10">
-                    <div className="text-sm font-extrabold text-[#1E2f31] uppercase tracking-wider flex items-center gap-2">
-                        <Map size={16} className="text-[#1C6048]" /> <span>Geo-Demographics</span>
+                <div className="p-4 border-b border-[#D8D8D8] flex flex-col gap-3 sticky top-0 bg-white/95 z-10">
+                    <div className="flex justify-between items-center">
+                        <div className="text-sm font-extrabold text-[#1E2f31] uppercase tracking-wider flex items-center gap-2">
+                            <Map size={16} className="text-[#1C6048]" /> <span>Geo-Demographics</span>
+                        </div>
+                        <button onClick={() => setIsPanelOpen(false)} className="text-[#9B8B70] hover:text-[#1E2F31]"><X size={16}/></button>
                     </div>
-                    <button onClick={() => setIsPanelOpen(false)} className="text-[#9B8B70] hover:text-[#1E2F31]"><X size={16}/></button>
-                </div>
-                
-                <div className="p-4 flex flex-col gap-5">
                     {/* Master Label Toggle */}
-                    <div className="flex items-center justify-between pb-3 border-b border-[#EFEBE7] -mb-2">
-                        <span className="text-xs font-bold text-[#8A8175] uppercase tracking-wider">Show Region Labels</span>
+                    <div className="flex items-center justify-between">
+                        <span className="text-[8px] font-bold text-[#8A8175] uppercase tracking-wider">Labels</span>
                         <label className="switch item">
                             <input 
                                 type="checkbox" 
@@ -2284,6 +2297,10 @@ const InteractiveDemographicMap = memo(() => {
                             <span className="slider"></span>
                         </label>
                     </div>
+                </div>
+                
+                <div className="p-4 flex flex-col gap-5">
+                    
 
                     <select value={viewMode} onChange={(e) => setViewMode(e.target.value)} className="w-full p-2 bg-[#F9F8F6] border border-[#D8D8D8] rounded-lg font-bold text-xs text-[#1E2f31] outline-none cursor-pointer">
                         <option value="admin">Administrative Regions</option>
@@ -2296,8 +2313,10 @@ const InteractiveDemographicMap = memo(() => {
 
                     <div className="flex flex-col gap-1">
                         <div className="flex justify-between items-center text-[11px] font-extrabold text-[#1C6048] uppercase tracking-wider pb-1 border-b border-dashed border-[#d8d8d8] cursor-pointer" onClick={() => setRegionsSectionExpanded(!regionsSectionExpanded)}>
-                            <span>Regions</span>
-                            <ChevronDown size={14} className={`transition-transform duration-300 ${!regionsSectionExpanded ? '-rotate-90' : ''}`} />
+                            <div className="flex items-center gap-1.5">
+                                <span>Regions</span>
+                                <ChevronDown size={14} className={`transition-transform duration-300 ${!regionsSectionExpanded ? '-rotate-90' : ''}`} />
+                            </div>
                         </div>
                         {regionsSectionExpanded && Object.entries(regionGroups).map(([groupName, regions]) => (
                             <div key={groupName} className={`flex flex-col transition-all ${expandedGroups[groupName] ? 'mb-2' : ''}`}>
@@ -2335,10 +2354,15 @@ const InteractiveDemographicMap = memo(() => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <div className="flex justify-between items-center text-[11px] font-extrabold text-[#1C6048] uppercase tracking-wider pb-1 border-b border-dashed border-[#d8d8d8] cursor-pointer" onClick={() => setPoiSectionExpanded(!poiSectionExpanded)}>
-                            <span>Locations</span>
-                            <label className="switch group ml-auto mr-2" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.length === mapLocations.length} onChange={toggleAllPoi} /><span className="slider"></span></label>
-                            <ChevronDown size={14} className={`transition-transform duration-300 ${!poiSectionExpanded ? '-rotate-90' : ''}`} />
+                        <div className="flex justify-between items-center text-[11px] font-extrabold text-[#1C6048] uppercase tracking-wider pb-1 border-b border-dashed border-[#d8d8d8] cursor-pointer pr-2" onClick={() => setPoiSectionExpanded(!poiSectionExpanded)}>
+                            <div className="flex items-center gap-1.5">
+                                <span>Locations</span>
+                                <ChevronDown size={14} className={`transition-transform duration-300 ${!poiSectionExpanded ? '-rotate-90' : ''}`} />
+                            </div>
+                            <label className="switch group" onClick={e => e.stopPropagation()}>
+                                <input type="checkbox" checked={activePOIs.length === mapLocations.length} onChange={toggleAllPoi} />
+                                <span className="slider"></span>
+                            </label>
                         </div>
                         {poiSectionExpanded && (
                             <div className="flex flex-col mt-1">
@@ -2357,15 +2381,23 @@ const InteractiveDemographicMap = memo(() => {
                                                     <ChevronDown size={14} className={`transition-transform duration-300 ${!expandedPoiGroups[groupName] ? '-rotate-90' : ''}`} />
                                                     <span>{groupName}</span>
                                                 </div>
+                                                <label className="switch group" onClick={e => e.stopPropagation()}>
+                                                    <input type="checkbox" checked={groupLocs.every(l => activePOIs.includes(l.id))} onChange={() => {
+                                                        const ids = groupLocs.map(l => l.id);
+                                                        const allActive = ids.every(id => activePOIs.includes(id));
+                                                        setActivePOIs(prev => allActive ? prev.filter(id => !ids.includes(id)) : [...new Set([...prev, ...ids])]);
+                                                    }} />
+                                                    <span className="slider"></span>
+                                                </label>
                                             </div>
                                             
                                             {expandedPoiGroups[groupName] && (
                                                 <div className="flex flex-col">
                                                     
                                                     {/* Anchor / Base Locations (No SubGroup) */}
-                                                    {groupLocs.filter(l => !l.subGroup).map(loc => (
+                                                    {groupLocs.filter(l => !l.subGroup).map((loc, index) => (
                                                         <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
-                                                            <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
+                                                            <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
                                                             <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                         </div>
                                                     ))}
@@ -2440,9 +2472,9 @@ const InteractiveDemographicMap = memo(() => {
                                                                         )}
                                                                         
                                                                         {/* Class A Loop */}
-                                                                        {(expandedSubGroups[`${subGroupName}_ClassA`] !== false) && subGroupLocs.filter(l => l.tier === 'Class A' || !isDistanceFolder).map(loc => (
+                                                                        {(expandedSubGroups[`${subGroupName}_ClassA`] !== false) && subGroupLocs.filter(l => l.tier === 'Class A' || !isDistanceFolder).map((loc, index) => (
                                                                             <div key={loc.id} className={`flex justify-between items-center py-1.5 ${isDistanceFolder ? 'pl-12' : 'pl-10'} pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors`} onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
-                                                                                <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
+                                                                                <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
                                                                                 <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                                             </div>
                                                                         ))}
@@ -2466,9 +2498,9 @@ const InteractiveDemographicMap = memo(() => {
                                                                         )}
                                                                         
                                                                         {/* Class B Loop */}
-                                                                        {(expandedSubGroups[`${subGroupName}_ClassB`] !== false) && isDistanceFolder && subGroupLocs.filter(l => l.tier === 'Class B').map(loc => (
+                                                                        {(expandedSubGroups[`${subGroupName}_ClassB`] !== false) && isDistanceFolder && subGroupLocs.filter(l => l.tier === 'Class B').map((loc, index) => (
                                                                             <div key={loc.id} className="flex justify-between items-center py-1.5 pl-12 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
-                                                                                <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
+                                                                                <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
                                                                                 <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                                             </div>
                                                                         ))}
@@ -2549,8 +2581,15 @@ const InteractiveDemographicMap = memo(() => {
             {!isPanelOpen && (
                 <div onClick={() => setIsPanelOpen(true)} className="absolute top-4 left-4 z-[1000] bg-white/90 backdrop-blur-md p-2.5 rounded-xl shadow-md border border-[#D8D8D8] cursor-pointer hover:bg-white text-[#1E2F31] font-bold text-xs uppercase flex items-center gap-2"><Map size={16} className="text-[#1C6048]"/> Open Map Data</div>
             )}
-
-            <div onClick={() => setIsMeasuring(!isMeasuring)} className={`absolute bottom-4 left-[64px] z-[1000] w-[34px] h-[34px] rounded flex justify-center items-center cursor-pointer shadow-[0_1px_5px_rgba(0,0,0,0.65)] border-2 border-black/20 bg-clip-padding transition-all ${isMeasuring ? 'bg-[#f4f4f4] text-[#1C6048]' : 'bg-white text-[#4C4A4B] hover:bg-[#f4f4f4] hover:text-[#1C6048]'}`} title="Measure Distance"><Ruler size={16} strokeWidth={2.5} /></div>
+            {/* Combined Toolbar (Target & Ruler) matching Leaflet native style */}
+            <div className="leaflet-bar absolute bottom-4 left-[60px] z-[1000] cursor-pointer">
+                <a onClick={(e) => { e.preventDefault(); frameActiveRegions(mapRef.current); }} title="Reset View to Active Regions" className="hover:!text-[#1C6048]">
+                    <Target size={16} strokeWidth={2.5} />
+                </a>
+                <a onClick={(e) => { e.preventDefault(); setIsMeasuring(!isMeasuring); }} title="Measure Distance" className={isMeasuring ? '!bg-[#E8EFEA] !text-[#1C6048]' : 'hover:!text-[#1C6048]'}>
+                    <Ruler size={16} strokeWidth={2.5} />
+                </a>
+            </div>
         </div>
     );
 });
