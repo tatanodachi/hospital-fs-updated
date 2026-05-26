@@ -1838,14 +1838,14 @@ const InteractiveDemographicMap = memo(() => {
             { permanent: true, direction: 'center', className: 'static-region-tooltip', interactive: false, pane: 'labelsPane' }
         );
 
-        // 2. Simple hover effect (just highlights the border/fill, no tooltips!)
+        // 2. Simple hover effect that respects the current View Mode colors
         layer.on('mouseover', (e) => {
             if (isHoveringPoi?.current) return;
-            layer.setStyle({ fillOpacity: 0.35, weight: 3 });
+            applyLayerStyle(layer, region.id, true, viewModeRef.current);
         });
 
         layer.on('mouseout', () => {
-            applyLayerStyle(layer, region.id, false, viewMode);
+            applyLayerStyle(layer, region.id, false, viewModeRef.current);
         });
         
         // Hide the hover tooltip instantly if the user clicks to open the persistent popup
@@ -2062,6 +2062,7 @@ const InteractiveDemographicMap = memo(() => {
         if (!L) return;
         flyToWithOffset(L.latLngBounds([lat, lon], [lat, lon]), true);
     };
+    const handlePoiHover = () => {}; // FIX: Neutralizes ReferenceError
 
     useEffect(() => {
         const map = mapRef.current;
@@ -2145,26 +2146,16 @@ const InteractiveDemographicMap = memo(() => {
     };
     const toggleAllPoi = () => setActivePOIs(prev => prev.length === mapLocations.length ? [] : mapLocations.map(l => l.id));
 
-    const handlePoiHover = (locId, isHovering) => {
-        const marker = poiMarkersRef.current[locId];
-        if (marker && mapRef.current) {
-            if (isHovering) {
-                // Forcefully hide region tooltips to prevent overlapping
-                clearTimeout(hoverTooltipRef.current._enterTimeout);
-                if (mapRef.current.hasLayer(hoverTooltipRef.current)) {
-                    mapRef.current.removeLayer(hoverTooltipRef.current);
-                }
-                marker.setStyle({ radius: 12, weight: 4, color: '#1E2F31' });
-                if (typeof marker.bringToFront === 'function') marker.bringToFront();
-                marker.openTooltip();
-            } else {
-                isHoveringPoi.current = false;
-                const loc = mapLocations.find(l => l.id === locId);
-                marker.setStyle({ radius: 8, weight: 2, color: '#EFEBE7', fillColor: loc.color });
-                marker.closeTooltip();
-            }
-        }
+    const getLegendData = () => {
+        if (viewMode === 'admin') return { title: "Provinces", items: [{ c: '#1C6048', l: 'DKI Jakarta' }, { c: '#1E2f31', l: 'Banten' }, { c: '#9B8B70', l: 'West Java' }] };
+        if (viewMode === 'population') return { title: "Population", items: [{ c: '#7C3A21', l: '> 3.0M' }, { c: '#A95C3E', l: '2.0M - 3.0M' }, { c: '#D08C70', l: '1.5M - 2.0M' }, { c: '#E8C2B3', l: '< 1.5M' }] };
+        if (viewMode === 'density') return { title: "Density (/km²)", items: [{ c: '#134433', l: '> 15k' }, { c: '#1C6048', l: '10k - 15k' }, { c: '#41856B', l: '5k - 10k' }, { c: '#99B6AA', l: '< 5k' }] };
+        if (viewMode === 'economy') return { title: "GDRP (IDR M)", items: [{ c: '#8C7A5E', l: '> 500' }, { c: '#AFA189', l: '300 - 500' }, { c: '#C8BEAC', l: '100 - 300' }, { c: '#E1DCD3', l: '< 100' }] };
+        if (viewMode === 'commuter') return { title: "Commuter Flow", items: [{ c: '#1E3A8A', l: '> 60%' }, { c: '#3B82F6', l: '45% - 60%' }, { c: '#60A5FA', l: '30% - 45%' }, { c: '#DBEAFE', l: '< 30%' }] };
+        if (viewMode === 'age') return { title: "Median Age", items: [{ c: '#581C87', l: '≥ 31' }, { c: '#8B5CF6', l: '29 - 30' }, { c: '#C084FC', l: '27 - 28' }, { c: '#F3E8FF', l: '< 27' }] };
+        return null;
     };
+    const legendInfo = getLegendData();
 
     return (
         <div className="w-full h-[600px] rounded-2xl overflow-hidden relative z-10 font-sans border border-[#D8D8D8] shadow-sm">
@@ -2271,6 +2262,21 @@ const InteractiveDemographicMap = memo(() => {
 
             <div className="vignette"></div>
             <div id="demographics-map" className="w-full h-full z-[1]"></div>
+
+            {/* Dynamic Map Legend */}
+            {legendInfo && (
+                <div className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-md border border-[#D8D8D8] pointer-events-auto transition-all">
+                    <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mb-2 border-b border-[#D8D8D8] pb-1">{legendInfo.title}</h4>
+                    <div className="flex flex-col gap-1.5">
+                        {legendInfo.items.map((item, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                                <span className="w-3 h-3 rounded-sm shadow-sm" style={{ backgroundColor: item.c }}></span>
+                                <span className="text-[9px] font-bold text-[#4C4A4B]">{item.l}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className={`absolute bottom-4 right-4 z-[1010] bg-white/70 backdrop-blur-sm border border-[#D8D8D8]/50 py-2 px-4 rounded-lg shadow-md text-xs font-medium text-[#4C4A4B] transition-opacity duration-500 pointer-events-none flex items-center ${loadingStatus.active ? 'opacity-100' : 'opacity-0'}`}>
                 <span className={`inline-block w-2 h-2 rounded-full mr-2 ${loadingStatus.active ? 'bg-[#1C6048] animate-pulse' : 'bg-[#1C6048]'}`}></span>
