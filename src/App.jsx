@@ -2171,8 +2171,8 @@ const InteractiveDemographicMap = memo(() => {
                             <ChevronDown size={14} className={`transition-transform duration-300 ${!regionsSectionExpanded ? '-rotate-90' : ''}`} />
                         </div>
                         {regionsSectionExpanded && Object.entries(regionGroups).map(([groupName, regions]) => (
-                            <div key={groupName} className="mt-1">
-                                <div className="flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer mb-1" onClick={() => setExpandedGroups(p => ({ ...p, [groupName]: !p[groupName] }))}>
+                            <div key={groupName} className={`flex flex-col transition-all ${expandedGroups[groupName] ? 'mb-2' : ''}`}>
+                                <div className={`flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer transition-all ${expandedGroups[groupName] ? 'mb-1' : ''}`} onClick={() => setExpandedGroups(p => ({ ...p, [groupName]: !p[groupName] }))}>
                                     <div className="flex items-center gap-1.5">
                                         <ChevronDown size={14} className={`transition-transform duration-300 ${!expandedGroups[groupName] ? '-rotate-90' : ''}`} />
                                         <span>{groupName}</span>
