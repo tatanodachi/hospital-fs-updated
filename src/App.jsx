@@ -4743,7 +4743,7 @@ export default function App() {
     location: "Daan Mogot Road KM. 13, West Jakarta", 
     type: "Specialized Hospital (Class A)", 
     totalLand: "±1.2 Ha", 
-    totalBuilding: "13,000 sqm", 
+    totalBuilding: "13,000 Sqm", 
     status: "Planning / Feasibility Phase",
     zoning: "K1 - Trade & Services",
     landTitle: "Right to Build (HGB)",
