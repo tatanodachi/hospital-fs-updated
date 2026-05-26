@@ -1668,20 +1668,52 @@ const targetRegions = [
 ];
 
 const mapLocations = [
-    // Primary Anchor (With pulsing rings)
+    // --- VASANTA ECOSYSTEM ---
     { id: "vasanta", name: "Proposed Vasanta Hospital", group: "Vasanta", desc: "120-Bed Oncology Hub", lat: -6.1543, lon: 106.7398, color: "#1C6048", radii: [5000, 10000] },
     
-    // Competitors / Nodes
-    { id: "tb", name: "TB Simatupang", group: "General", desc: "South Jakarta competitor node", lat: -6.293221, lon: 106.81898208, color: "#9B8B70" },
-    { id: "pik", name: "Pantai Indah Kapuk", group: "General", desc: "Premium coastal district", lat: -6.1112, lon: 106.7404, color: "#9B8B70" },
+    // Vasanta: < 5km Radius (Class B)
+        { id: "v_rsgk", name: "RS EMC Grha Kedoya", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1681, lon: 106.7651, color: "#A95C3E" },
+    { id: "v_hermina_dm", name: "Hermina Daan Mogot", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1554, lon: 106.7082, color: "#A95C3E" },
+    { id: "v_rspi_puri", name: "RS Pondok Indah Puri Indah", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1866, lon: 106.7358, color: "#A95C3E" },
+    { id: "v_siloam_kj", name: "Siloam Kebon Jeruk", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1912, lon: 106.7621, color: "#A95C3E" },
+    { id: "v_rsud_cengkareng", name: "RSUD Cengkareng", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Public (B)", lat: -6.1362, lon: 106.7298, color: "#A95C3E" },
 
-    // Existing Cancer Hospitals
+    // Vasanta: 5-10km Radius (Class A)
+    { id: "v_mandaya", name: "Mandaya Royal Puri", group: "Vasanta", subGroup: "< 5km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1985, lon: 106.7045, color: "#A95C3E" },
+    { id: "v_tarakan", name: "RSUD Tarakan", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Public (A)", lat: -6.1732, lon: 106.8090, color: "#A95C3E" },
+    { id: "v_dharmais", name: "Dharmais Cancer Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "National Cancer Center (Public)", lat: -6.1953, lon: 106.7990, color: "#A95C3E" },
+    { id: "v_rsab", name: "RSAB Harapan Kita", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Maternal & Child (Public)", lat: -6.1955, lon: 106.7981, color: "#A95C3E" },
+    { id: "v_rsjpn", name: "RSJPN Harapan Kita", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Cardiac Center (Public)", lat: -6.1942, lon: 106.7985, color: "#A95C3E" },
+    { id: "v_rsj_soeharto", name: "RSJ Dr. Soeharto Heerdjan", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Mental Health (Public)", lat: -6.1625, lon: 106.7860, color: "#A95C3E" },
+    { id: "v_fkg_trisakti", name: "RSGM FKG Trisakti", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class A", desc: "Dental Center", lat: -6.1685, lon: 106.7885, color: "#A95C3E" },
+
+    // Vasanta: 5-10km Radius (Class B)
+    { id: "v_tzuchi", name: "Tzu Chi Hospital - PIK", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1060, lon: 106.7392, color: "#A95C3E" },
+    { id: "v_pik", name: "Pantai Indah Kapuk Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1112, lon: 106.7404, color: "#A95C3E" },
+    { id: "v_husada", name: "RS Husada", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1415, lon: 106.8251, color: "#A95C3E" },
+    { id: "v_ladokgi", name: "RSGM Ladokgi", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Dental (Public)", lat: -6.2111, lon: 106.8075, color: "#A95C3E" },
+    { id: "v_mintohardjo", name: "RSAL Dr. Mintohardjo", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Naval Hospital (Public)", lat: -6.2085, lon: 106.8078, color: "#A95C3E" },
+    { id: "v_atma_jaya", name: "RS Atma Jaya", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1135, lon: 106.7885, color: "#A95C3E" },
+    { id: "v_pluit", name: "Pluit Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1182, lon: 106.7931, color: "#A95C3E" },
+    { id: "v_pelni", name: "RS Pelni", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Public (B)", lat: -6.1925, lon: 106.8001, color: "#A95C3E" },
+    { id: "v_ciputra", name: "Ciputra Hospital CitraGarden", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1265, lon: 106.7055, color: "#A95C3E" },
+    { id: "v_sumber_waras", name: "Sumber Waras Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1652, lon: 106.7971, color: "#A95C3E" },
+    { id: "v_royal_taruma", name: "Royal Taruma Hospital", group: "Vasanta", subGroup: "5-10km Radius", tier: "Class B", desc: "Private (B)", lat: -6.1645, lon: 106.7871, color: "#A95C3E" },
+
+    // --- CANCER HOSPITALS (Static/Standalone Group) ---
+    // Class A
     { id: "dharmais", name: "Dharmais Cancer Hospital", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.1953, lon: 106.7990, color: "#A95C3E" },
     { id: "mrccc", name: "MRCCC Siloam Semanggi", group: "Cancer Hospitals", subGroup: "Class A", desc: "Private Comprehensive Cancer Center", lat: -6.2201, lon: 106.8155, color: "#A95C3E" },
-    { id: "rscm", name: "RSUPN Cipto Mangunkusumo", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.197636, lon: 106.8470, color: "#A95C3E" },
-    { id: "tzuchi", name: "Tzu Chi Hospital - PIK", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat:  -6.106093, lon: 106.739282, color: "#A95C3E" },
-    { id: "mandaya", name: "Mandaya Royal Puri", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.19850329, lon: 106.704590, color: "#A95C3E" },
-    { id: "rsgk", name: "RS EMC Grha Kedoya", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.16813979, lon: 106.76515, color: "#A95C3E" }
+    { id: "rscm", name: "RSUPN Cipto Mangunkusumo", group: "Cancer Hospitals", subGroup: "Class A", desc: "National Cancer Center (Public)", lat: -6.1976, lon: 106.8470, color: "#A95C3E" },
+    
+    // Class B
+    { id: "tzuchi", name: "Tzu Chi Hospital - PIK", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat:  -6.1060, lon: 106.7392, color: "#A95C3E" },
+    { id: "mandaya", name: "Mandaya Royal Puri", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.1985, lon: 106.7045, color: "#A95C3E" },
+    { id: "rsgk", name: "RS EMC Grha Kedoya", group: "Cancer Hospitals", subGroup: "Class B", desc: "Private (B)", lat: -6.1681, lon: 106.7651, color: "#A95C3E" },
+
+    // --- GENERAL NODES ---
+    { id: "tb", name: "TB Simatupang", group: "General", desc: "South Jakarta competitor node", lat: -6.2932, lon: 106.8189, color: "#9B8B70" },
+    { id: "pik", name: "Pantai Indah Kapuk", group: "General", desc: "Premium coastal district", lat: -6.1112, lon: 106.7404, color: "#9B8B70" }
 ];
 
 const ageCohorts = ["70+", "60-69", "50-59", "40-49", "30-39", "20-29", "10-19", "0-9"];
@@ -1727,9 +1759,10 @@ const InteractiveDemographicMap = memo(() => {
     const [regionsSectionExpanded, setRegionsSectionExpanded] = useState(true);
     const [poiSectionExpanded, setPoiSectionExpanded] = useState(true);
     const [expandedGroups, setExpandedGroups] = useState({});
-    const [expandedPoiGroups, setExpandedPoiGroups] = useState({ 'Vasanta': false, 'Cancer Hospitals': false, 'General': false });
-    const [expandedSubGroups, setExpandedSubGroups] = useState({ 'Class A': false, 'Class B': false });
+    const [expandedPoiGroups, setExpandedPoiGroups] = useState({ 'Vasanta': true, 'Cancer Hospitals': false, 'General': false });
+    const [expandedSubGroups, setExpandedSubGroups] = useState({ 'Class A': true, '< 5km Radius': true, '5-10km Radius': false });
     const [activeRegions, setActiveRegions] = useState(targetRegions.filter(r => !r.defaultOff).map(r => r.id));
+    const [showRegionLabels, setShowRegionLabels] = useState(false);
     const [activePOIs, setActivePOIs] = useState(mapLocations.map(l => l.id));
     const [loadingStatus, setLoadingStatus] = useState({ active: true, text: 'Initializing...', isError: false });
     const [regionFetchStatuses, setRegionFetchStatuses] = useState({});
@@ -1743,6 +1776,7 @@ const InteractiveDemographicMap = memo(() => {
     const poiGroupRef = useRef(null);
     const poiLayersRef = useRef({});
     const poiMarkersRef = useRef({});
+    const isHoveringPoi = useRef(false);
     const measureStateRef = useRef({ points: [], line: null, dynamicLine: null, tooltip: null, markers: [] });
 
     const viewModeRef = useRef(viewMode);
@@ -1794,34 +1828,21 @@ const InteractiveDemographicMap = memo(() => {
     const setupLayerInteractions = (layer, region, mapInstance) => {
         let lastLatLng = null;
 
-        layer.on('mouseover', function (e) {
-            if (measureStateRef.current.isMeasuring) return;
-            applyLayerStyle(this, region.id, true, viewModeRef.current);
-            if (typeof this.bringToFront === 'function') this.bringToFront();
-            
-            clearTimeout(hoverTooltipRef.current._exitTimeout);
-            lastLatLng = e.latlng;
+        if (isHoveringPoi.current) return;
+        // 1. Permanently bind the static text to the center of the region
+        layer.bindTooltip(
+            `<div class="static-region-name">${region.name}</div>`, 
+            { permanent: true, direction: 'center', className: 'static-region-tooltip', interactive: false }
+        );
 
-            hoverTooltipRef.current._enterTimeout = setTimeout(() => {
-                const tooltipContent = getTooltipContent(region, viewModeRef.current);
-                hoverTooltipRef.current.setLatLng(lastLatLng).setContent(tooltipContent).addTo(mapInstance);
-            }, 500);
+        // 2. Simple hover effect (just highlights the border/fill, no tooltips!)
+        layer.on('mouseover', (e) => {
+            if (isHoveringPoi?.current) return;
+            layer.setStyle({ fillOpacity: 0.35, weight: 3 });
         });
 
-        layer.on('mousemove', function (e) {
-            // Track position, but DO NOT instantly move the tooltip (removes the "sticky" behavior)
-            lastLatLng = e.latlng;
-        });
-
-        layer.on('mouseout', function () {
-            applyLayerStyle(this, region.id, false, viewModeRef.current);
-            clearTimeout(hoverTooltipRef.current._enterTimeout);
-            
-            hoverTooltipRef.current._exitTimeout = setTimeout(() => {
-                if (mapInstance.hasLayer(hoverTooltipRef.current)) {
-                    mapInstance.removeLayer(hoverTooltipRef.current);
-                }
-            }, 0);
+        layer.on('mouseout', () => {
+            applyLayerStyle(layer, region.id, false, viewMode);
         });
         
         // Hide the hover tooltip instantly if the user clicks to open the persistent popup
@@ -1864,7 +1885,12 @@ const InteractiveDemographicMap = memo(() => {
             let retries = 2;
             while (!success && retries > 0) {
                 try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(region.query)}&polygon_geojson=1&format=json`);
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(region.query)}&polygon_geojson=1&format=json`, { 
+                        headers: { 
+                            'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+                            'User-Agent': 'GeoDemographic-Hospital-App/1.0 (Contact: admin@vasanta.com)'
+                        } 
+                    });
                     if (!response.ok) throw new Error(`HTTP Error`);
                     const data = await response.json();
                     
@@ -1939,6 +1965,16 @@ const InteractiveDemographicMap = memo(() => {
             }
             const marker = L.circleMarker([loc.lat, loc.lon], { radius: 8, fillColor: loc.color, color: '#EFEBE7', weight: 2, opacity: 1, fillOpacity: 1, pane: 'markersPane' }).addTo(singlePoiGroup);
             marker.bindTooltip(`<b>${loc.name}</b><br><span style="font-size:11px;color:#777;">${loc.desc}</span>`, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' });
+            marker.on('mouseover', () => {
+                isHoveringPoi.current = true; // Engage Lock
+                clearTimeout(hoverTooltipRef.current?._enterTimeout);
+                if (hoverTooltipRef.current && mapInstance.hasLayer(hoverTooltipRef.current)) {
+                    mapInstance.removeLayer(hoverTooltipRef.current);
+                }
+            });
+            marker.on('mouseout', () => {
+                isHoveringPoi.current = false; // Disengage Lock
+            });
             poiLayersRef.current[loc.id] = singlePoiGroup;
             poiMarkersRef.current[loc.id] = marker;
             
@@ -2104,10 +2140,16 @@ const InteractiveDemographicMap = memo(() => {
         const marker = poiMarkersRef.current[locId];
         if (marker && mapRef.current) {
             if (isHovering) {
+                // Forcefully hide region tooltips to prevent overlapping
+                clearTimeout(hoverTooltipRef.current._enterTimeout);
+                if (mapRef.current.hasLayer(hoverTooltipRef.current)) {
+                    mapRef.current.removeLayer(hoverTooltipRef.current);
+                }
                 marker.setStyle({ radius: 12, weight: 4, color: '#1E2F31' });
                 if (typeof marker.bringToFront === 'function') marker.bringToFront();
                 marker.openTooltip();
             } else {
+                isHoveringPoi.current = false;
                 const loc = mapLocations.find(l => l.id === locId);
                 marker.setStyle({ radius: 8, weight: 2, color: '#EFEBE7', fillColor: loc.color });
                 marker.closeTooltip();
@@ -2118,6 +2160,26 @@ const InteractiveDemographicMap = memo(() => {
     return (
         <div className="w-full h-[600px] rounded-2xl overflow-hidden relative z-10 font-sans border border-[#D8D8D8] shadow-sm">
             <style>{`
+                /* --- 1. NEW STATIC REGION LABELS --- */
+                .static-region-tooltip { 
+                    background: transparent !important; 
+                    border: none !important; 
+                    box-shadow: none !important; 
+                    pointer-events: none !important; 
+                    transition: opacity 0.3s ease;
+                    ${!showRegionLabels ? 'opacity: 0 !important; visibility: hidden !important;' : ''}
+                }
+                .static-region-tooltip .leaflet-tooltip-tip { display: none; }
+                .static-region-name { 
+                    font-size: 11px; 
+                    font-weight: 800; 
+                    text-transform: uppercase; 
+                    letter-spacing: 2px; 
+                    color: rgba(30, 47, 49, 0.5);
+                    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8), -1px -1px 2px rgba(255, 255, 255, 0.8);
+                }
+
+                /* --- 2. ORIGINAL ESSENTIAL APP STYLES --- */
                 .vignette {
                     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
                     box-shadow: inset 0 0 200px rgba(30, 47, 49, 0.35);
@@ -2131,12 +2193,14 @@ const InteractiveDemographicMap = memo(() => {
                 }
                 .leaflet-tooltip.custom-tooltip { padding: 10px 14px; opacity: 1 !important; }
                 .leaflet-popup-content { margin: 10px 14px; line-height: 1.4; }
-                /* Custom Scrollbar to preserve panel rounded corners */
+                
+                /* Custom Scrollbar */
                 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; margin: 16px 0; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(155, 139, 112, 0.5); border-radius: 8px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(155, 139, 112, 0.8); }
                 
+                /* UI Switches */
                 .switch { position: relative; display: inline-block; flex-shrink: 0; }
                 .switch.group { width: 32px; height: 18px; margin-left: 8px; }
                 .switch.item { width: 24px; height: 14px; }
@@ -2149,15 +2213,15 @@ const InteractiveDemographicMap = memo(() => {
                 .switch.item input:checked + .slider { background-color: #1E2f31; }
                 .switch.group input:checked + .slider:before { transform: translateX(14px); }
                 .switch.item input:checked + .slider:before { transform: translateX(10px); }
+                
+                /* Animations */
                 @keyframes breathePulse { 0% { opacity: 0.1; } 100% { opacity: 0.5; } }
                 .breathe-outer { animation: breathePulse 3s infinite alternate ease-in-out; }
                 .breathe-inner { animation: breathePulse 3s infinite alternate-reverse ease-in-out; }
                 
-                /* Align Leaflet controls with Tailwind 16px grid */
+                /* Leaflet Controls */
                 .leaflet-left .leaflet-control { margin-left: 16px !important; }
                 .leaflet-bottom .leaflet-control { margin-bottom: 16px !important; }
-                
-                /* Unify Leaflet Zoom Control with Ruler Design */
                 .leaflet-bar {
                     border: 2px solid rgba(0,0,0,0.2) !important;
                     box-shadow: 0 1px 5px rgba(0,0,0,0.65) !important;
@@ -2202,6 +2266,19 @@ const InteractiveDemographicMap = memo(() => {
                 </div>
                 
                 <div className="p-4 flex flex-col gap-5">
+                    {/* Master Label Toggle */}
+                    <div className="flex items-center justify-between pb-3 border-b border-[#EFEBE7] -mb-2">
+                        <span className="text-xs font-bold text-[#8A8175] uppercase tracking-wider">Show Region Labels</span>
+                        <label className="switch item">
+                            <input 
+                                type="checkbox" 
+                                checked={showRegionLabels} 
+                                onChange={() => setShowRegionLabels(!showRegionLabels)} 
+                            />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+
                     <select value={viewMode} onChange={(e) => setViewMode(e.target.value)} className="w-full p-2 bg-[#F9F8F6] border border-[#D8D8D8] rounded-lg font-bold text-xs text-[#1E2f31] outline-none cursor-pointer">
                         <option value="admin">Administrative Regions</option>
                         <option value="population">Total Population</option>
@@ -2244,7 +2321,7 @@ const InteractiveDemographicMap = memo(() => {
                                         }}
                                     >
                                         <span className="cursor-pointer hover:text-[#1C6048]" onClick={() => handleRegionClick(region.id)}>{region.name}</span>
-                                        <label className="switch item"><input type="checkbox" checked={activeRegions.includes(region.id)} onChange={() => toggleRegion(region.id)} disabled={regionFetchStatuses[region.id] !== 'loading'} /><span className="slider"></span></label>
+                                        <label className="switch item"><input type="checkbox" checked={activeRegions.includes(region.id)} onChange={() => toggleRegion(region.id)} disabled={regionFetchStatuses[region.id] === 'loading'} /><span className="slider"></span></label>
                                     </div>
                                 ))}
                             </div>
@@ -2262,8 +2339,10 @@ const InteractiveDemographicMap = memo(() => {
                                 {['Vasanta', 'Cancer Hospitals', 'General'].map(groupName => {
                                     const groupLocs = mapLocations.filter(loc => loc.group === groupName);
                                     if (groupLocs.length === 0) return null;
+                                    
                                     return (
                                         <div key={groupName} className={`flex flex-col transition-all ${expandedPoiGroups[groupName] ? 'mb-2' : ''}`}>
+                                            {/* TIER 1: The Main Group Header */}
                                             <div 
                                                 className={`flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer transition-all ${expandedPoiGroups[groupName] ? 'mb-1' : ''}`}
                                                 onClick={() => setExpandedPoiGroups(p => ({ ...p, [groupName]: !p[groupName] }))}
@@ -2273,54 +2352,125 @@ const InteractiveDemographicMap = memo(() => {
                                                     <span>{groupName}</span>
                                                 </div>
                                             </div>
+                                            
                                             {expandedPoiGroups[groupName] && (
                                                 <div className="flex flex-col">
                                                     
-                                                    {/* Standard Locations (No Sub-Group) */}
+                                                    {/* Anchor / Base Locations (No SubGroup) */}
                                                     {groupLocs.filter(l => !l.subGroup).map(loc => (
-                                                        <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover(loc.id, true)} onMouseLeave={() => handlePoiHover(loc.id, false)}>
+                                                        <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
                                                             <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
                                                             <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                         </div>
                                                     ))}
 
-                                                    {/* Class A Sub-Group */}
-                                                    {groupLocs.some(l => l.subGroup === 'Class A') && (
-                                                        <div className="flex flex-col mt-0.5">
-                                                            <div 
-                                                                className="flex items-center gap-1.5 text-[9px] font-black text-[#1E2F31] uppercase px-2 py-1 mb-0.5 opacity-60 hover:opacity-100 hover:bg-[#F9F8F6] rounded cursor-pointer transition-all"
-                                                                onClick={() => setExpandedSubGroups(p => ({ ...p, 'Class A': !p['Class A'] }))}
-                                                            >
-                                                                <ChevronDown size={12} className={`transition-transform duration-300 ${!expandedSubGroups['Class A'] ? '-rotate-90' : ''}`} />
-                                                                <span>Class A (Comprehensive)</span>
-                                                            </div>
-                                                            {expandedSubGroups['Class A'] && groupLocs.filter(l => l.subGroup === 'Class A').map(loc => (
-                                                                <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover(loc.id, true)} onMouseLeave={() => handlePoiHover(loc.id, false)}>
-                                                                    <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
-                                                                    <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                                    {/* TIER 2: Sub-Groups Loop (e.g., '< 5km Radius' or 'Class A') */}
+                                                    {[...new Set(groupLocs.filter(l => l.subGroup).map(l => l.subGroup))].map(subGroupName => {
+                                                        const subGroupLocs = groupLocs.filter(l => l.subGroup === subGroupName);
+                                                        
+                                                        // Determine if this is a distance folder or a standalone class
+                                                        const isDistanceFolder = subGroupName.includes('km Radius');
 
-                                                    {/* Class B Sub-Group */}
-                                                    {groupLocs.some(l => l.subGroup === 'Class B') && (
-                                                        <div className="flex flex-col mt-0.5">
-                                                            <div 
-                                                                className="flex items-center gap-1.5 text-[9px] font-black text-[#1E2F31] uppercase px-2 py-1 mb-0.5 opacity-60 hover:opacity-100 hover:bg-[#F9F8F6] rounded cursor-pointer transition-all"
-                                                                onClick={() => setExpandedSubGroups(p => ({ ...p, 'Class B': !p['Class B'] }))}
-                                                            >
-                                                                <ChevronDown size={12} className={`transition-transform duration-300 ${!expandedSubGroups['Class B'] ? '-rotate-90' : ''}`} />
-                                                                <span>Class B (Specialized)</span>
+                                                        return (
+                                                            <div key={subGroupName} className={`flex flex-col ${isDistanceFolder ? 'mt-0.5' : ''}`}>
+                                                                
+                                                                {isDistanceFolder ? (
+                                                                    // 1. Collapsible Distance Folder with Master Toggle
+                                                                    <div 
+                                                                        className="flex justify-between items-center text-[9px] font-black text-[#1E2F31] uppercase px-2 py-1 mb-0.5 opacity-70 hover:opacity-100 hover:bg-[#F9F8F6] rounded cursor-pointer transition-all"
+                                                                        onClick={() => setExpandedSubGroups(p => ({ ...p, [subGroupName]: !p[subGroupName] }))}
+                                                                    >
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <ChevronDown size={12} className={`transition-transform duration-300 ${expandedSubGroups[subGroupName] === false ? '-rotate-90' : ''}`} />
+                                                                            <span>{subGroupName}</span>
+                                                                        </div>
+                                                                        <label className="switch group" onClick={e => e.stopPropagation()}>
+                                                                            <input type="checkbox" checked={subGroupLocs.every(l => activePOIs.includes(l.id))} onChange={() => {
+                                                                                const ids = subGroupLocs.map(l => l.id);
+                                                                                const allActive = ids.every(id => activePOIs.includes(id));
+                                                                                setActivePOIs(prev => allActive ? prev.filter(id => !ids.includes(id)) : [...new Set([...prev, ...ids])]);
+                                                                            }} />
+                                                                            <span className="slider"></span>
+                                                                        </label>
+                                                                    </div>
+                                                                ) : (
+                                                                    // 2. Standalone Class Header (e.g., Cancer Hospitals > Class A) with Toggle
+                                                                    <div className="flex justify-between items-center pl-7 pr-2 mt-1.5 mb-0.5 border-b border-[#D8D8D8]/50 pb-0.5 opacity-70 hover:opacity-100 cursor-pointer" onClick={() => setExpandedSubGroups(p => ({ ...p, [subGroupName]: !p[subGroupName] }))}>
+                                                                        <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
+                                                                            <ChevronDown size={10} className={`transition-transform duration-300 ${expandedSubGroups[subGroupName] === false ? '-rotate-90' : ''}`} />
+                                                                            <span>{subGroupName}</span>
+                                                                        </div>
+                                                                        <label className="switch item scale-75 origin-right" onClick={e => e.stopPropagation()}>
+                                                                            <input type="checkbox" checked={subGroupLocs.every(l => activePOIs.includes(l.id))} onChange={() => {
+                                                                                const ids = subGroupLocs.map(l => l.id);
+                                                                                const allActive = ids.every(id => activePOIs.includes(id));
+                                                                                setActivePOIs(prev => allActive ? prev.filter(id => !ids.includes(id)) : [...new Set([...prev, ...ids])]);
+                                                                            }} />
+                                                                            <span className="slider"></span>
+                                                                        </label>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* TIER 3: Nested Items & Sub-Sub Headers (Rendered if Tier 2 is expanded) */}
+                                                                {(expandedSubGroups[subGroupName] !== false) && (
+                                                                    <div className="flex flex-col mb-1">
+                                                                        
+                                                                        {/* Class A Sub-Header inside Distance Folder */}
+                                                                        {isDistanceFolder && subGroupLocs.some(l => l.tier === 'Class A') && (
+                                                                            <div className="flex justify-between items-center pl-9 pr-2 mt-1 mb-0.5 border-b border-[#D8D8D8]/50 pb-0.5 opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setExpandedSubGroups(p => ({ ...p, [`${subGroupName}_ClassA`]: !p[`${subGroupName}_ClassA`] }))}>
+                                                                                <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
+                                                                                    <ChevronDown size={10} className={`transition-transform duration-300 ${expandedSubGroups[`${subGroupName}_ClassA`] === false ? '-rotate-90' : ''}`} />
+                                                                                    <span>Class A (Comprehensive)</span>
+                                                                                </div>
+                                                                                <label className="switch item scale-75 origin-right" onClick={e => e.stopPropagation()}>
+                                                                                    <input type="checkbox" checked={subGroupLocs.filter(l => l.tier === 'Class A').every(l => activePOIs.includes(l.id))} onChange={() => {
+                                                                                        const ids = subGroupLocs.filter(l => l.tier === 'Class A').map(l => l.id);
+                                                                                        const allActive = ids.every(id => activePOIs.includes(id));
+                                                                                        setActivePOIs(prev => allActive ? prev.filter(id => !ids.includes(id)) : [...new Set([...prev, ...ids])]);
+                                                                                    }} />
+                                                                                    <span className="slider"></span>
+                                                                                </label>
+                                                                            </div>
+                                                                        )}
+                                                                        
+                                                                        {/* Class A Loop */}
+                                                                        {(expandedSubGroups[`${subGroupName}_ClassA`] !== false) && subGroupLocs.filter(l => l.tier === 'Class A' || !isDistanceFolder).map(loc => (
+                                                                            <div key={loc.id} className={`flex justify-between items-center py-1.5 ${isDistanceFolder ? 'pl-12' : 'pl-10'} pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors`} onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
+                                                                                <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
+                                                                                <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
+                                                                            </div>
+                                                                        ))}
+
+                                                                        {/* Class B Sub-Header inside Distance Folder */}
+                                                                        {isDistanceFolder && subGroupLocs.some(l => l.tier === 'Class B') && (
+                                                                            <div className="flex justify-between items-center pl-9 pr-2 mt-1.5 mb-0.5 border-b border-[#D8D8D8]/50 pb-0.5 opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setExpandedSubGroups(p => ({ ...p, [`${subGroupName}_ClassB`]: !p[`${subGroupName}_ClassB`] }))}>
+                                                                                <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
+                                                                                    <ChevronDown size={10} className={`transition-transform duration-300 ${expandedSubGroups[`${subGroupName}_ClassB`] === false ? '-rotate-90' : ''}`} />
+                                                                                    <span>Class B (Specialized)</span>
+                                                                                </div>
+                                                                                <label className="switch item scale-75 origin-right" onClick={e => e.stopPropagation()}>
+                                                                                    <input type="checkbox" checked={subGroupLocs.filter(l => l.tier === 'Class B').every(l => activePOIs.includes(l.id))} onChange={() => {
+                                                                                        const ids = subGroupLocs.filter(l => l.tier === 'Class B').map(l => l.id);
+                                                                                        const allActive = ids.every(id => activePOIs.includes(id));
+                                                                                        setActivePOIs(prev => allActive ? prev.filter(id => !ids.includes(id)) : [...new Set([...prev, ...ids])]);
+                                                                                    }} />
+                                                                                    <span className="slider"></span>
+                                                                                </label>
+                                                                            </div>
+                                                                        )}
+                                                                        
+                                                                        {/* Class B Loop */}
+                                                                        {(expandedSubGroups[`${subGroupName}_ClassB`] !== false) && isDistanceFolder && subGroupLocs.filter(l => l.tier === 'Class B').map(loc => (
+                                                                            <div key={loc.id} className="flex justify-between items-center py-1.5 pl-12 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
+                                                                                <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
+                                                                                <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                            {expandedSubGroups['Class B'] && groupLocs.filter(l => l.subGroup === 'Class B').map(loc => (
-                                                                <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover(loc.id, true)} onMouseLeave={() => handlePoiHover(loc.id, false)}>
-                                                                    <div><p className="font-bold text-[#1E2F31]">{loc.name}</p><p className="text-[9px] text-[#9B8B70]">{loc.desc}</p></div>
-                                                                    <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                                        );
+                                                    })}
                                                 </div>
                                             )}
                                         </div>
@@ -4495,6 +4645,35 @@ const MasterTimelineView = memo(({ isPresenting }) => {
 // ==========================================
 // 5. MAIN APP COMPONENT
 // ==========================================
+
+// --- GLASSMORPHISM CSS INJECTION ---
+const style = document.createElement('style');
+style.textContent = `
+    .glass-tooltip-container {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .glass-tooltip-container .leaflet-tooltip-tip {
+        display: none;
+    }
+    .glass-region-label {
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        padding: 10px 16px;
+        color: #1E2F31;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+    }
+    .glass-title { font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #1C6048; }
+    .glass-sub { font-size: 11px; font-weight: 700; color: #4C4A4B; margin-top: 2px; display: block; }
+`;
+document.head.appendChild(style);
+
 export default function App() {
   const [activeGroup, setActiveGroup] = useState('context'); // 'context' or 'financials'
   const [activeCompany, setActiveCompany] = useState('opco'); 
