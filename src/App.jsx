@@ -5,7 +5,8 @@ import {
 } from 'recharts';
 import { 
   Calculator, TrendingUp, DollarSign, Activity, FileText, 
-  Settings, LayoutDashboard, List, Users, Shield, Scale, 
+  Settings, LayoutDashboard, List, Users, Shield, Scale,
+  AlignLeft, AlignRight, EyeOff, Maximize2, 
   ArrowUpRight, Link2, Coins, Building2, Stethoscope, Briefcase, 
   ShieldCheck, HeartPulse, Sparkles, BrainCircuit, RefreshCcw, BarChart3, 
   PieChart as PieChartIcon, Map, Landmark, ArrowRightLeft, X, Download, 
@@ -4737,6 +4738,7 @@ export default function App() {
   const [isLockedOpCo, setIsLockedOpCo] = useState(true);
   const [isLockedPropCo, setIsLockedPropCo] = useState(true);
   const [isPresenting, setIsPresenting] = useState(false);
+  const [hubPosition, setHubPosition] = useState('center'); // 'center', 'left', 'right', 'minimized'
 
   // Cloud Sync State
   const [isCloudSync, setIsCloudSync] = useState(false);
@@ -5177,22 +5179,51 @@ export default function App() {
         {activeTab === 'ai' && activeGroup === 'financials' && <AIAuditView activeCompany={activeCompany} aiInsights={aiInsights} isAiLoading={isAiLoading} generateAIInsights={generateAIInsights} askQuery={askQuery} setAskQuery={setAskQuery} handleAskAI={handleAskAI} isAskLoading={isAskLoading} askResponse={askResponse} />}
       </main>
 
-      {/* PRESENTER FLOATING HUB */}
+      {/* PRESENTER FLOATING HUB (Glassmorphic & Movable) */}
       {isPresenting && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-white/95 backdrop-blur-xl p-2 rounded-full shadow-[0_10px_40px_rgba(30,47,49,0.2)] border border-[#D8D8D8] animate-in slide-in-from-bottom-8">
-           <button onClick={goToPrevSlide} disabled={safeSlideIndex === 0} className="w-16 h-14 flex items-center justify-center bg-[#F9F8F6] hover:bg-[#EFEBE7] disabled:opacity-30 disabled:hover:bg-transparent rounded-full transition-all text-[#1E2F31]">
-              <ChevronLeft size={28} strokeWidth={2.5}/>
-           </button>
-           
-           <div className="flex flex-col items-center px-6 min-w-[220px] cursor-default">
-             <span className="text-[10px] font-bold text-[#9B8B70] uppercase tracking-widest mb-0.5">Slide {safeSlideIndex + 1} of {presentationSteps.length}</span>
-             <span className="text-sm font-black text-[#1E2F31] whitespace-nowrap">{presentationSteps[safeSlideIndex].label}</span>
-           </div>
-           
-           <button onClick={goToNextSlide} disabled={safeSlideIndex === presentationSteps.length - 1} className="w-16 h-14 flex items-center justify-center bg-[#1C6048] hover:bg-opacity-90 disabled:opacity-50 rounded-full transition-all text-white shadow-md">
-              <ChevronRight size={28} strokeWidth={2.5}/>
-           </button>
-        </div>
+        hubPosition === 'minimized' ? (
+          <button 
+            onClick={() => setHubPosition('center')}
+            className="fixed bottom-6 right-6 z-[100] w-12 h-12 flex items-center justify-center bg-white/40 backdrop-blur-2xl border border-white/60 shadow-[0_8px_32px_rgba(30,47,49,0.15)] rounded-full text-[#1E2F31] hover:bg-white/70 transition-all animate-in zoom-in"
+            title="Restore Hub"
+          >
+            <Maximize2 size={20} />
+          </button>
+        ) : (
+          <div className={`fixed z-[100] flex items-center gap-1.5 p-2 rounded-full transition-all duration-700 ease-in-out bg-white/40 backdrop-blur-2xl border border-white/60 shadow-[0_8px_32px_rgba(30,47,49,0.15)] ${
+            hubPosition === 'center' ? 'bottom-6 left-1/2 -translate-x-1/2' :
+            hubPosition === 'left' ? 'bottom-6 left-6' :
+            'bottom-6 right-6'
+          }`}>
+             {/* Left Move Toggle */}
+             {hubPosition !== 'left' && (
+               <button onClick={() => setHubPosition(hubPosition === 'right' ? 'center' : 'left')} className="w-8 h-8 flex items-center justify-center rounded-full text-[#4C4A4B] hover:bg-white/50 transition-all ml-1" title={hubPosition === 'right' ? "Move to Center" : "Move to Left"}><AlignLeft size={16}/></button>
+             )}
+             
+             <button onClick={goToPrevSlide} disabled={safeSlideIndex === 0} className="w-14 h-14 flex items-center justify-center bg-white/70 hover:bg-white disabled:opacity-30 disabled:hover:bg-white/70 rounded-full transition-all text-[#1E2F31] shadow-sm ml-1">
+                <ChevronLeft size={28} strokeWidth={2.5}/>
+             </button>
+             
+             {/* Info Area (Hover to reveal Hide button) */}
+             <div className="flex flex-col items-center px-4 min-w-[180px] cursor-default group relative">
+               <span className="text-[10px] font-bold text-[#1C6048] uppercase tracking-widest mb-0.5 drop-shadow-sm">Slide {safeSlideIndex + 1} of {presentationSteps.length}</span>
+               <span className="text-sm font-black text-[#1E2F31] whitespace-nowrap drop-shadow-sm">{presentationSteps[safeSlideIndex].label}</span>
+               
+               <button onClick={() => setHubPosition('minimized')} className="absolute -top-10 bg-white/60 backdrop-blur-xl px-4 py-1.5 rounded-full text-[11px] font-bold text-[#1E2F31] opacity-0 group-hover:opacity-100 transition-all shadow-sm border border-white/60 flex items-center gap-1.5 hover:bg-white/90">
+                 <EyeOff size={14}/> Hide Hub
+               </button>
+             </div>
+             
+             <button onClick={goToNextSlide} disabled={safeSlideIndex === presentationSteps.length - 1} className="w-14 h-14 flex items-center justify-center bg-[#1C6048]/80 backdrop-blur-md hover:bg-[#1C6048] disabled:opacity-50 rounded-full transition-all text-white shadow-md mr-1">
+                <ChevronRight size={28} strokeWidth={2.5}/>
+             </button>
+
+             {/* Right Move Toggle */}
+             {hubPosition !== 'right' && (
+               <button onClick={() => setHubPosition(hubPosition === 'left' ? 'center' : 'right')} className="w-8 h-8 flex items-center justify-center rounded-full text-[#4C4A4B] hover:bg-white/50 transition-all mr-1" title={hubPosition === 'left' ? "Move to Center" : "Move to Right"}><AlignRight size={16}/></button>
+             )}
+          </div>
+        )
       )}
 
       <SelectionPopupComp state={selectionState} setState={setSelectionState} onAsk={handleSelectionAsk} />
