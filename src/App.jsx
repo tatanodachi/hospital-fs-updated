@@ -1804,6 +1804,7 @@ const InteractiveDemographicMap = memo(() => {
         if (!leafletReady || mapRef.current) return;
         const L = window.L;
 
+        
         const map = L.map('demographics-map', { zoomControl: false }).setView([-6.1543, 106.7398], 11);
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
@@ -2175,7 +2176,7 @@ const InteractiveDemographicMap = memo(() => {
                     font-weight: 800; 
                     text-transform: uppercase; 
                     letter-spacing: 2px; 
-                    color: rgba(30, 47, 49, 0.5);
+                    color: rgba(30, 47, 49, 0.4);
                     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8), -1px -1px 2px rgba(255, 255, 255, 0.8);
                 }
 
@@ -2607,7 +2608,11 @@ const StudyView = memo(({ isPresenting, info }) => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
         {/* Navigation Bar for Study */}
-        <div className="flex bg-white p-1.5 rounded-2xl border border-[#D8D8D8] shadow-sm w-fit overflow-x-auto max-w-full">
+        <div className={`flex p-1.5 rounded-2xl border border-[#D8D8D8] w-fit overflow-x-auto max-w-full transition-all ${
+            isPresenting 
+                ? 'bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(30,47,49,0.15)] fixed bottom-28 left-1/2 -translate-x-1/2 z-[105]' 
+                : 'bg-white shadow-sm mb-6 relative'
+        }`}>
           <button 
             onClick={() => setActiveMiniTab('macro')} 
             className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === 'macro' ? 'bg-[#99B6AA] text-[#1E2F31] shadow-md' : 'text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50'}`}
@@ -4775,6 +4780,40 @@ export default function App() {
   const [propCoAssumptions, setPropCoAssumptions] = useState(DEFAULT_PROPCO_ASSUMPTIONS);
 
   const [holdCoScenario, setHoldCoScenario] = useState('manual');
+  // --- PRESENTATION NAVIGATION LOGIC ---
+  const presentationSteps = useMemo(() => [
+    { group: 'context', tab: 'overview', company: 'opco', label: '1. Project Context' },
+    { group: 'context', tab: 'study', company: 'opco', label: '2. Feasibility Study' },
+    { group: 'context', tab: 'collab', company: 'opco', label: '3. Collaboration Model' },
+    { group: 'context', tab: 'timeline', company: 'opco', label: '4. Master Timeline' },
+    { group: 'financials', tab: 'dashboard', company: 'opco', label: '5. OpCo Financials' },
+    { group: 'financials', tab: 'dashboard', company: 'propco', label: '6. PropCo Financials' },
+    { group: 'financials', tab: 'dashboard', company: 'consolidated', label: '7. HoldCo (Consolidated)' }
+  ], []);
+
+  const currentSlideIndex = presentationSteps.findIndex(s => 
+    s.group === activeGroup && 
+    (activeGroup === 'context' ? s.tab === activeTab : (s.company === activeCompany && s.tab === 'dashboard'))
+  );
+  const safeSlideIndex = Math.max(0, currentSlideIndex);
+
+  const goToNextSlide = () => {
+    if (safeSlideIndex < presentationSteps.length - 1) {
+      const next = presentationSteps[safeSlideIndex + 1];
+      setActiveGroup(next.group);
+      setActiveTab(next.tab);
+      setActiveCompany(next.company);
+    }
+  };
+
+  const goToPrevSlide = () => {
+    if (safeSlideIndex > 0) {
+      const prev = presentationSteps[safeSlideIndex - 1];
+      setActiveGroup(prev.group);
+      setActiveTab(prev.tab);
+      setActiveCompany(prev.company);
+    }
+  };
 
   const projConfig = useMemo(() => {
       if (holdCoScenario === 'manual') return { exitYear: opCoAssumptions.includeTerminalValue ? 10 : -1, projYears: 10 };
@@ -5036,7 +5075,7 @@ export default function App() {
                  activeTab === 'timeline' ? "Project Timeline" :
                  activeCompany === 'opco' ? "Hospital Operation Model" : 
                  activeCompany === 'propco' ? "PropCo Real Estate Model" :
-                 "HoldCo Consolidated Position"}
+                 "HoldCo Consolidated"}
               </h1>
             </div>
 
@@ -5047,32 +5086,68 @@ export default function App() {
                   <NavButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<FileText size={14} />} label="Overview" />
                   <NavButton active={activeTab === 'study'} onClick={() => setActiveTab('study')} icon={<BookOpen size={14} />} label="Study" />
                   <NavButton active={activeTab === 'collab'} onClick={() => setActiveTab('collab')} icon={<Network size={14} />} label="Collaboration Strategy" />
-                  <NavButton active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')} icon={<Calendar size={14} />} label="Timeline" />
                 </>
               ) : (
                 <>
-                  <div className="flex bg-white p-0.5 rounded-md border border-[#D8D8D8] mr-2 shadow-sm animate-in slide-in-from-right duration-300">
-                    <button onClick={() => handleCompanyChange('opco')} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${activeCompany === 'opco' ? 'bg-[#1C6048] text-white shadow-inner' : 'text-[#4C4A4B] hover:bg-[#F9F8F6]'}`}>OpCo</button>
-                    <button onClick={() => handleCompanyChange('propco')} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${activeCompany === 'propco' ? 'bg-[#9B8B70] text-white shadow-inner' : 'text-[#4C4A4B] hover:bg-[#F9F8F6]'}`}>PropCo</button>
-                    <button onClick={() => handleCompanyChange('consolidated')} className={`px-3 py-1 rounded text-[10px] font-bold transition-colors ${activeCompany === 'consolidated' ? 'bg-[#1E2F31] text-white shadow-inner' : 'text-[#4C4A4B] hover:bg-[#F9F8F6]'}`}>HoldCo</button>
-                  </div>
-                  <NavButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard size={14} />} label="Dashboard" />
-                  <NavButton active={activeTab === 'comprehensive'} onClick={() => setActiveTab('comprehensive')} icon={<List size={14} />} label="Cascade" />
-                  <NavButton active={activeTab === 'sensitivity'} onClick={() => setActiveTab('sensitivity')} icon={<TrendingUp size={14} />} label="Sensitivity" disabled={activeCompany === 'consolidated'} />
-                  <NavButton active={activeTab === 'assumptions'} onClick={() => setActiveTab('assumptions')} icon={<Settings size={14} />} label="Settings" disabled={activeCompany === 'consolidated'} />
-                  <div className="w-px h-4 bg-[#D8D8D8] mx-1"></div>
-                  <NavButton active={activeTab === 'ai'} onClick={() => setActiveTab('ai')} icon={<AIMicroscopeIcon size={14} />} label="AI Audit" />
+                  <NavButton active={activeCompany === 'opco'} onClick={() => handleCompanyChange('opco')} icon={<Activity size={14} />} label="OpCo" />
+                  <NavButton active={activeCompany === 'propco'} onClick={() => handleCompanyChange('propco')} icon={<Building2 size={14} />} label="PropCo" />
+                  <NavButton active={activeCompany === 'consolidated'} onClick={() => handleCompanyChange('consolidated')} icon={<Layers size={14} />} label="HoldCo VG" />
                 </>
               )}
             </div>
           </div>
         </div>
-      </nav>
+     </nav>
 
       <main className={`transition-all duration-300 ${containerClass} ${isPresenting ? 'mt-4' : 'mt-6'}`}>
+        
+        {/* FINANCIALS SUB-NAVIGATION (Matches Study Tab Style) */}
+        {activeGroup === 'financials' && (
+          <div className={`flex p-1.5 gap-1 rounded-2xl border border-[#D8D8D8] w-fit overflow-x-auto max-w-full transition-all ${
+            isPresenting 
+                ? 'bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(30,47,49,0.15)] fixed bottom-[100px] left-1/2 -translate-x-1/2 z-[105]' 
+                : 'bg-white shadow-sm mb-6 relative z-10'
+          }`}>
+            <button 
+              onClick={() => setActiveTab('dashboard')} 
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-[#1C6048] text-white shadow-md' : 'text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50'}`}
+            >
+              <LayoutDashboard size={16}/> Dashboard
+            </button>
+            <button 
+              onClick={() => setActiveTab('comprehensive')} 
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'comprehensive' ? 'bg-[#9B8B70] text-white shadow-md' : 'text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50'}`}
+            >
+              <List size={16}/> Cascade
+            </button>
+            <button 
+              disabled={activeCompany === 'consolidated'}
+              onClick={() => setActiveTab('sensitivity')} 
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeCompany === 'consolidated' ? 'opacity-30 cursor-not-allowed text-[#4C4A4B]' : activeTab === 'sensitivity' ? 'bg-[#1E2F31] text-white shadow-md' : 'text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50'}`}
+            >
+              <TrendingUp size={16}/> Sensitivity
+            </button>
+            <button 
+              disabled={activeCompany === 'consolidated'}
+              onClick={() => setActiveTab('assumptions')} 
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeCompany === 'consolidated' ? 'opacity-30 cursor-not-allowed text-[#4C4A4B]' : activeTab === 'assumptions' ? 'bg-[#99B6AA] text-[#1E2F31] shadow-md' : 'text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50'}`}
+            >
+              <Settings size={16}/> Settings
+            </button>
+            <div className="w-px h-6 bg-[#D8D8D8] mx-1 self-center"></div>
+            <button 
+              onClick={() => setActiveTab('ai')} 
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'ai' ? 'bg-[#4C4A4B] text-white shadow-md' : 'text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50'}`}
+            >
+              <AIMicroscopeIcon size={16}/> AI Audit
+            </button>
+          </div>
+        )}
+
+        
         {activeTab === 'overview' && <ProjectOverviewView info={projectInfo} setInfo={setProjectInfo} isLocked={activeCompany === 'opco' ? isLockedOpCo : isLockedPropCo} />}
         {activeTab === 'study' && <StudyView isPresenting={isPresenting} info={projectInfo} />}
-        {activeTab === 'collab' && <CollaborationStrategyView isPresenting={isPresenting} />}
+         {activeTab === 'collab' && <CollaborationStrategyView isPresenting={isPresenting} />}
         {activeTab === 'timeline' && <MasterTimelineView isPresenting={isPresenting} />}
         {activeTab !== 'overview' && activeTab !== 'study' && activeTab !== 'collab' && activeTab !== 'timeline' && activeTab !== 'ai' && activeCompany === 'opco' && activeGroup === 'financials' && (
             <div className="animate-in fade-in duration-500">
@@ -5101,6 +5176,24 @@ export default function App() {
         
         {activeTab === 'ai' && activeGroup === 'financials' && <AIAuditView activeCompany={activeCompany} aiInsights={aiInsights} isAiLoading={isAiLoading} generateAIInsights={generateAIInsights} askQuery={askQuery} setAskQuery={setAskQuery} handleAskAI={handleAskAI} isAskLoading={isAskLoading} askResponse={askResponse} />}
       </main>
+
+      {/* PRESENTER FLOATING HUB */}
+      {isPresenting && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-white/95 backdrop-blur-xl p-2 rounded-full shadow-[0_10px_40px_rgba(30,47,49,0.2)] border border-[#D8D8D8] animate-in slide-in-from-bottom-8">
+           <button onClick={goToPrevSlide} disabled={safeSlideIndex === 0} className="w-16 h-14 flex items-center justify-center bg-[#F9F8F6] hover:bg-[#EFEBE7] disabled:opacity-30 disabled:hover:bg-transparent rounded-full transition-all text-[#1E2F31]">
+              <ChevronLeft size={28} strokeWidth={2.5}/>
+           </button>
+           
+           <div className="flex flex-col items-center px-6 min-w-[220px] cursor-default">
+             <span className="text-[10px] font-bold text-[#9B8B70] uppercase tracking-widest mb-0.5">Slide {safeSlideIndex + 1} of {presentationSteps.length}</span>
+             <span className="text-sm font-black text-[#1E2F31] whitespace-nowrap">{presentationSteps[safeSlideIndex].label}</span>
+           </div>
+           
+           <button onClick={goToNextSlide} disabled={safeSlideIndex === presentationSteps.length - 1} className="w-16 h-14 flex items-center justify-center bg-[#1C6048] hover:bg-opacity-90 disabled:opacity-50 rounded-full transition-all text-white shadow-md">
+              <ChevronRight size={28} strokeWidth={2.5}/>
+           </button>
+        </div>
+      )}
 
       <SelectionPopupComp state={selectionState} setState={setSelectionState} onAsk={handleSelectionAsk} />
 
