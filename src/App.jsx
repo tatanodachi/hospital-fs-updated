@@ -1716,7 +1716,23 @@ const mapLocations = [
 
     // --- GENERAL NODES ---
     { id: "tb", name: "TB Simatupang", group: "General", desc: "South Jakarta competitor node", lat: -6.2932, lon: 106.8189, color: "#9B8B70" },
-    { id: "pik", name: "Pantai Indah Kapuk", group: "General", desc: "Premium coastal district", lat: -6.1112, lon: 106.7404, color: "#9B8B70" }
+    { id: "pik", name: "Pantai Indah Kapuk", group: "General", desc: "Premium coastal district", lat: -6.1112, lon: 106.7404, color: "#9B8B70" },
+    {
+        id: 'Soekarno-Hatta Airport',
+        name: 'Soekarno-Hatta Airport',
+        group: 'General', 
+        desc: 'Transit Hub',
+        query: 'Bandar Udara Internasional Soekarno-Hatta',
+        color: '#4B5563', // Slate gray to distinguish from city demographics
+        fillColor: '#6B7280',
+        population: 'Transit Hub',
+        density: 'N/A',
+        hospitals: 1, 
+        clinics: 3,
+        fallbackLat: -6.1256,
+        fallbackLon: 106.6558,
+        fallbackRadius: 0.035
+    },
 ];
 
 const ageCohorts = ["70+", "60-69", "50-59", "40-49", "30-39", "20-29", "10-19", "0-9"];
@@ -1805,7 +1821,14 @@ const InteractiveDemographicMap = memo(() => {
         if (!leafletReady || mapRef.current) return;
         const L = window.L;
 
+        // SAFEGUARD: Wipe dead ghost layers so they don't persist across React 18 remounts
+        regionsLayersRef.current = {}; 
+        geoJsonCacheRef.current = {};
         
+        // SAFEGUARD: Clear residual map IDs
+        const container = document.getElementById('demographics-map');
+        if (container && container._leaflet_id) { container._leaflet_id = null; }
+
         const map = L.map('demographics-map', { zoomControl: false }).setView([-6.1543, 106.7398], 11);
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
@@ -1865,21 +1888,13 @@ const InteractiveDemographicMap = memo(() => {
 
     const syncRegionBorders = async (mapInstance, activeIds) => {
         const L = window.L;
-        // Find regions that are checked ON but haven't been fetched yet
         const missingIds = activeIds.filter(id => !regionsLayersRef.current[id] && regionFetchStatuses[id] !== 'loading');
         
-        // --- NEW: Check if any regions are currently in transit ---
-        const isAnythingLoading = activeIds.some(id => regionFetchStatuses[id] === 'loading');
-
         if (missingIds.length === 0) {
-            // --- NEW: Only move the camera if all downloads are fully complete ---
-            if (!isAnythingLoading) {
-                frameActiveRegions(mapInstance);
-            }
+            frameActiveRegions(mapInstance);
             return;
         }
 
-        // FIX: Instantly lock ALL missing regions as 'loading' to prevent duplicate background loops
         setRegionFetchStatuses(prev => {
             const next = { ...prev };
             missingIds.forEach(id => next[id] = 'loading');
@@ -1892,49 +1907,51 @@ const InteractiveDemographicMap = memo(() => {
 
             setLoadingStatus({ active: true, text: `Loading boundary: ${region.name}`, isError: false });
             
-            let success = false;
-            let retries = 2;
-            while (!success && retries > 0) {
-                try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(region.query)}&polygon_geojson=1&format=json`, { 
-                        headers: { 
-                            'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-                            'User-Agent': 'GeoDemographic-Hospital-App/1.0 (Contact: admin@vasanta.com)'
-                        } 
-                    });
-                    if (!response.ok) throw new Error(`HTTP Error`);
-                    const data = await response.json();
-                    
-                    if (data && data.length > 0 && data[0].geojson) {
-                        geoJsonCacheRef.current[id] = data[0].geojson;
-                        const layer = L.geoJSON(data[0].geojson, { className: 'region-polygon' });
-                        setupLayerInteractions(layer, region, mapInstance);
-                        success = true;
-                    } else {
-                        throw new Error("No GeoJSON");
-                    }
-                } catch (error) {
-                    retries--;
-                    if (retries <= 0) {
-                        const fallbackGeoJSON = generateFallbackGeoJSON(region.fallbackLat, region.fallbackLon, region.fallbackRadius);
-                        geoJsonCacheRef.current[id] = fallbackGeoJSON;
-                        const layer = L.geoJSON(fallbackGeoJSON, { className: 'region-polygon' });
-                        setupLayerInteractions(layer, region, mapInstance);
-                        success = true;
-                    } else {
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                    }
+            try {
+                // Fetch the REAL jagged polygon boundaries from OpenStreetMap
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(region.query)}&polygon_geojson=1&format=json`);
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
+                
+                let geojsonData;
+                if (data && data.length > 0 && data[0].geojson) {
+                    geojsonData = data[0].geojson;
+                } else {
+                    geojsonData = generateFallbackGeoJSON(region.fallbackLat, region.fallbackLon, region.fallbackRadius);
+                }
+
+                geoJsonCacheRef.current[id] = geojsonData;
+                const layer = L.geoJSON(geojsonData, { className: 'region-polygon' });
+                
+                // CRITICAL: We must save it to the cache and add it to the map physically!
+                regionsLayersRef.current[id] = layer;
+                layer.addTo(mapInstance);
+                if (typeof setupLayerInteractions === 'function') {
+                    setupLayerInteractions(layer, region, mapInstance);
+                }
+
+            } catch (error) {
+                console.warn(`Failed to load real boundary for ${region.name}, using fallback.`);
+                
+                // Draw the fallback circle boundary polyline
+                const fallbackGeoJSON = generateFallbackGeoJSON(region.fallbackLat, region.fallbackLon, region.fallbackRadius);
+                geoJsonCacheRef.current[id] = fallbackGeoJSON;
+                const layer = L.geoJSON(fallbackGeoJSON, { className: 'region-polygon' });
+                
+                // Cache it and physically add it to the map
+                regionsLayersRef.current[id] = layer;
+                layer.addTo(mapInstance);
+                if (typeof setupLayerInteractions === 'function') {
+                    setupLayerInteractions(layer, region, mapInstance);
                 }
             }
-            // 1-second delay to respect OpenStreetMap Nominatim API limits
-            await new Promise(resolve => setTimeout(resolve, 1000)); 
+            
+            // 300ms delay to keep the API happy without freezing your screen for 15 seconds
+            await new Promise(resolve => setTimeout(resolve, 300)); 
         }
         
-        setLoadingStatus({ active: true, text: "Boundaries loaded", isError: false });
-        setTimeout(() => {
-            setLoadingStatus(prev => ({ ...prev, active: false }));
-            frameActiveRegions(mapInstance);
-        }, 1000);
+        setLoadingStatus(prev => ({ ...prev, active: false }));
+        frameActiveRegions(mapInstance);
     };
 
     const getTooltipContent = (region, mode) => {
@@ -1966,28 +1983,70 @@ const InteractiveDemographicMap = memo(() => {
 
     const initPOIs = (mapInstance) => {
         const L = window.L;
-        mapLocations.forEach(loc => {
+        mapLocations.forEach(async loc => {
             const singlePoiGroup = L.layerGroup();
+            
+            // Resolve coordinates dynamically (supports standard lat/lon or fallbackLat/fallbackLon)
+            const lat = loc.lat !== undefined ? loc.lat : loc.fallbackLat;
+            const lon = loc.lon !== undefined ? loc.lon : loc.fallbackLon;
+            
+            if (lat === undefined || lon === undefined) return;
+
+            // Draw real polyline/polygon boundaries for locations if coordinates exist
+            if (loc.boundaryCoords) {
+                L.polyline(loc.boundaryCoords, { color: loc.color, weight: 2, dashArray: '4, 4', fillColor: loc.color, fillOpacity: 0.1, interactive: false, pane: 'ringsPane' }).addTo(singlePoiGroup);
+            }
+
+            // Draw dynamic boundaries if a query is defined in the location snippet
+            if (loc.query) {
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc.query)}&polygon_geojson=1&format=json`);
+                    if (!response.ok) throw new Error("API Error");
+                    const data = await response.json();
+                    
+                    let geojsonData;
+                    if (data && data.length > 0 && data[0].geojson) {
+                        geojsonData = data[0].geojson;
+                    } else {
+                        geojsonData = generateFallbackGeoJSON(loc.fallbackLat, loc.fallbackLon, loc.fallbackRadius);
+                    }
+                    
+                    L.geoJSON(geojsonData, { 
+                        color: loc.color, 
+                        weight: 2, 
+                        dashArray: '4, 4', 
+                        fillColor: loc.fillColor || loc.color, 
+                        fillOpacity: 0.1, 
+                        interactive: false, 
+                        pane: 'ringsPane' 
+                    }).addTo(singlePoiGroup);
+                    
+                } catch (error) {
+                    const fallbackGeoJSON = generateFallbackGeoJSON(loc.fallbackLat, loc.fallbackLon, loc.fallbackRadius);
+                    L.geoJSON(fallbackGeoJSON, { 
+                        color: loc.color, 
+                        weight: 2, 
+                        dashArray: '4, 4', 
+                        fillColor: loc.fillColor || loc.color, 
+                        fillOpacity: 0.1, 
+                        interactive: false, 
+                        pane: 'ringsPane' 
+                    }).addTo(singlePoiGroup);
+                }
+            }
+
             if (loc.radii) {
                 loc.radii.sort((a, b) => b - a).forEach((radius, index) => {
                     const isOuter = index === 0; 
-                    L.circle([loc.lat, loc.lon], { radius: radius, color: loc.color, weight: isOuter ? 2 : 2.5, dashArray: isOuter ? '4, 8' : '6, 6', fillColor: loc.color, fillOpacity: 0.1, interactive: false, pane: 'ringsPane', className: isOuter ? 'breathe-outer' : 'breathe-inner' }).addTo(singlePoiGroup);
+                    L.circle([lat, lon], { radius: radius, color: loc.color, weight: isOuter ? 2 : 2.5, dashArray: isOuter ? '4, 8' : '6, 6', fillColor: loc.color, fillOpacity: 0.1, interactive: false, pane: 'ringsPane', className: isOuter ? 'breathe-outer' : 'breathe-inner' }).addTo(singlePoiGroup);
                 });
             }
-            const marker = L.circleMarker([loc.lat, loc.lon], { radius: 8, fillColor: loc.color, color: '#EFEBE7', weight: 2, opacity: 1, fillOpacity: 1, pane: 'markersPane' }).addTo(singlePoiGroup);
-            marker.bindTooltip(`<b>${loc.name}</b><br><span style="font-size:11px;color:#777;">${loc.desc}</span>`, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' });
-            marker.on('mouseover', () => {
-                isHoveringPoi.current = true; // Engage Lock
-                clearTimeout(hoverTooltipRef.current?._enterTimeout);
-                if (hoverTooltipRef.current && mapInstance.hasLayer(hoverTooltipRef.current)) {
-                    mapInstance.removeLayer(hoverTooltipRef.current);
-                }
-            });
-            marker.on('mouseout', () => {
-                isHoveringPoi.current = false; // Disengage Lock
-            });
+
+            const marker = L.circleMarker([lat, lon], { radius: 8, fillColor: loc.color, color: '#EFEBE7', weight: 2, opacity: 1, fillOpacity: 1, pane: 'markersPane' }).addTo(singlePoiGroup);
+            
+            marker.bindTooltip(`<b>${loc.name}</b><br><span style="font-size:11px;color:#777;">${loc.desc || loc.population || ''}</span>`, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' });
+            
             poiLayersRef.current[loc.id] = singlePoiGroup;
-            poiMarkersRef.current[loc.id] = marker;
             
             // Immediate sync: Force POIs to render instantly on map load
             if (activePOIs.includes(loc.id)) {
@@ -2265,9 +2324,10 @@ const InteractiveDemographicMap = memo(() => {
             <div className="vignette"></div>
             <div id="demographics-map" className="w-full h-full z-[1]"></div>
 
-            {/* Dynamic Map Legend */}
+            {/* Dynamic Dual Map Legend */}
             {legendInfo && (
-                <div className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-md border border-[#D8D8D8] pointer-events-auto transition-all">
+                <div className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-md border border-[#D8D8D8] pointer-events-auto transition-all min-w-[140px]">
+                    {/* 1. Demographic Section */}
                     <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mb-2 border-b border-[#D8D8D8] pb-1">{legendInfo.title}</h4>
                     <div className="flex flex-col gap-1.5">
                         {legendInfo.items.map((item, i) => (
@@ -2276,6 +2336,30 @@ const InteractiveDemographicMap = memo(() => {
                                 <span className="text-[9px] font-bold text-[#4C4A4B]">{item.l}</span>
                             </div>
                         ))}
+                    </div>
+                    
+                    {/* 2. Infrastructure Section */}
+                    <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mt-4 mb-2 border-b border-[#D8D8D8] pb-1">Infrastructure</h4>
+                    <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2">
+                            <div className="relative w-3 h-3 flex items-center justify-center">
+                                <span className="absolute inset-0 rounded-full border border-dashed border-[#1C6048] animate-[spin_10s_linear_infinite]"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#1C6048]"></span>
+                            </div>
+                            <span className="text-[9px] font-bold text-[#4C4A4B]">Vasanta Hub</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full border-2 border-white bg-[#99B6AA] shadow-sm"></span>
+                            <span className="text-[9px] font-bold text-[#4C4A4B]">Cancer Hsopitals</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full border-2 border-white bg-[#1E2F31] shadow-sm"></span>
+                            <span className="text-[9px] font-bold text-[#4C4A4B]">Class A</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full border-2 border-white bg-[#A95C3E] shadow-sm"></span>
+                            <span className="text-[9px] font-bold text-[#4C4A4B]">Class B</span>
+                        </div>
                     </div>
                 </div>
             )}
@@ -2338,7 +2422,7 @@ const InteractiveDemographicMap = memo(() => {
                                 {expandedGroups[groupName] && regions.map(region => (
                                     <div 
                                         key={region.id} 
-                                        className="flex justify-between items-center py-1 pl-4 pr-2 text-[10px] font-medium text-[#4C4A4B] hover:bg-[#EFEBE7] rounded transition-colors"
+                                        className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium text-[#4C4A4B] hover:bg-[#EFEBE7] rounded transition-colors"
                                         onMouseEnter={() => {
                                             const layer = regionsLayersRef.current[region.id];
                                             if (layer && mapRef.current?.hasLayer(layer)) {
@@ -2404,8 +2488,8 @@ const InteractiveDemographicMap = memo(() => {
                                                     
                                                     {/* Anchor / Base Locations (No SubGroup) */}
                                                     {groupLocs.filter(l => !l.subGroup).map((loc, index) => (
-                                                        <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
-                                                            <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
+                                                        <div key={loc.id} className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat !== undefined ? loc.lat : loc.fallbackLat, loc.lon !== undefined ? loc.lon : loc.fallbackLon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
+                                                            <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="hidden text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
                                                             <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                         </div>
                                                     ))}
@@ -2423,14 +2507,14 @@ const InteractiveDemographicMap = memo(() => {
                                                                 {isDistanceFolder ? (
                                                                     // 1. Collapsible Distance Folder with Master Toggle
                                                                     <div 
-                                                                        className="flex justify-between items-center text-[9px] font-black text-[#1E2F31] uppercase px-2 py-1 mb-0.5 opacity-70 hover:opacity-100 hover:bg-[#F9F8F6] rounded cursor-pointer transition-all"
+                                                                        className="flex justify-between items-center pl-7 pr-2 mt-1.5 mb-0.5 border-b border-[#D8D8D8]/50 pb-0.5 opacity-70 hover:opacity-100 cursor-pointer"
                                                                         onClick={() => setExpandedSubGroups(p => ({ ...p, [subGroupName]: !p[subGroupName] }))}
                                                                     >
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <ChevronDown size={12} className={`transition-transform duration-300 ${expandedSubGroups[subGroupName] === false ? '-rotate-90' : ''}`} />
+                                                                        <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
+                                                                            <ChevronDown size={10} className={`transition-transform duration-300 ${expandedSubGroups[subGroupName] === false ? '-rotate-90' : ''}`} />
                                                                             <span>{subGroupName}</span>
                                                                         </div>
-                                                                        <label className="switch group" onClick={e => e.stopPropagation()}>
+                                                                        <label className="switch item scale-75 origin-right" onClick={e => e.stopPropagation()}>
                                                                             <input type="checkbox" checked={subGroupLocs.every(l => activePOIs.includes(l.id))} onChange={() => {
                                                                                 const ids = subGroupLocs.map(l => l.id);
                                                                                 const allActive = ids.every(id => activePOIs.includes(id));
@@ -2482,7 +2566,7 @@ const InteractiveDemographicMap = memo(() => {
                                                                         {/* Class A Loop */}
                                                                         {(expandedSubGroups[`${subGroupName}_ClassA`] !== false) && subGroupLocs.filter(l => l.tier === 'Class A' || !isDistanceFolder).map((loc, index) => (
                                                                             <div key={loc.id} className={`flex justify-between items-center py-1.5 ${isDistanceFolder ? 'pl-12' : 'pl-10'} pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors`} onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
-                                                                                <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
+                                                                                <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="hidden text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
                                                                                 <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                                             </div>
                                                                         ))}
@@ -2508,7 +2592,7 @@ const InteractiveDemographicMap = memo(() => {
                                                                         {/* Class B Loop */}
                                                                         {(expandedSubGroups[`${subGroupName}_ClassB`] !== false) && isDistanceFolder && subGroupLocs.filter(l => l.tier === 'Class B').map((loc, index) => (
                                                                             <div key={loc.id} className="flex justify-between items-center py-1.5 pl-12 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors" onClick={() => handlePoiClick(loc.lat, loc.lon)} onMouseEnter={() => handlePoiHover?.(loc.id, true)} onMouseLeave={() => handlePoiHover?.(loc.id, false)}>
-                                                                                <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
+                                                                                <div className="truncate flex-1 min-w-0 pr-3"><span className="text-[#9B8B70] mr-1.5 font-bold">{index + 1}.</span><span className="font-bold text-[#1E2F31]">{loc.name}</span><span className="hidden text-[9px] text-[#9B8B70] ml-1.5">— {loc.desc}</span></div>
                                                                                 <label className="switch item" onClick={e => e.stopPropagation()}><input type="checkbox" checked={activePOIs.includes(loc.id)} onChange={() => setActivePOIs(prev => prev.includes(loc.id) ? prev.filter(i => i !== loc.id) : [...prev, loc.id])} /><span className="slider"></span></label>
                                                                             </div>
                                                                         ))}
@@ -5088,6 +5172,7 @@ export default function App() {
                   <NavButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<FileText size={14} />} label="Overview" />
                   <NavButton active={activeTab === 'study'} onClick={() => setActiveTab('study')} icon={<BookOpen size={14} />} label="Study" />
                   <NavButton active={activeTab === 'collab'} onClick={() => setActiveTab('collab')} icon={<Network size={14} />} label="Collaboration Strategy" />
+                  <NavButton active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')} icon={<Calendar size={14} />} label="Timeline" />
                 </>
               ) : (
                 <>
