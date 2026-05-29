@@ -3418,7 +3418,6 @@ const targetRegions = [
     fallbackLat: -6.1805,
     fallbackLon: 106.8284,
     fallbackRadius: 0.035,
-    defaultOff: true,
   },
   {
     id: "ju",
@@ -3439,7 +3438,6 @@ const targetRegions = [
     fallbackLat: -6.1214,
     fallbackLon: 106.8922,
     fallbackRadius: 0.04,
-    defaultOff: true,
   },
   {
     id: "js",
@@ -3522,6 +3520,7 @@ const targetRegions = [
     fallbackLat: -6.2886,
     fallbackLon: 106.7179,
     fallbackRadius: 0.05,
+    defaultOff: true,
   },
   {
     id: "tg",
@@ -4142,6 +4141,7 @@ const InteractiveDemographicMap = memo(() => {
   const [isMapReady, setIsMapReady] = useState(false);
   const [isMeasuring, setIsMeasuring] = useState(false);
 
+  const [isLegendOpen, setIsLegendOpen] = useState(false);
   const mapRef = useRef(null);
   const regionsLayersRef = useRef({});
   const geoJsonCacheRef = useRef({});
@@ -4593,7 +4593,28 @@ const InteractiveDemographicMap = memo(() => {
     if (!L) return;
     flyToWithOffset(L.latLngBounds([lat, lon], [lat, lon]), true);
   };
-  const handlePoiHover = () => {}; // FIX: Neutralizes ReferenceError
+  const handlePoiHover = useCallback((id, isHovering) => {
+    const layerGroup = poiLayersRef.current[id];
+    if (layerGroup) {
+      layerGroup.eachLayer((layer) => {
+        if (layer.options && layer.options.pane === "markersPane") {
+          layer.setStyle({
+            className: isHovering ? "glowing-marker" : "",
+            radius: 8,
+            weight: 2,
+            opacity: 1,
+          });
+          if (isHovering && typeof layer.bringToFront === 'function') {
+            layer.bringToFront();
+          }
+        }
+      });
+    }
+  }, []);
+
+  const handleGroupHover = useCallback((locs, isHovering) => {
+    locs.forEach(loc => handlePoiHover(loc.id, isHovering));
+  }, [handlePoiHover]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -4839,6 +4860,18 @@ const InteractiveDemographicMap = memo(() => {
                     box-shadow: inset 0 0 200px rgba(30, 47, 49, 0.35);
                     pointer-events: none; z-index: 10;
                 }
+                
+                @keyframes pulseGlow {
+                    0% { filter: drop-shadow(0 0 4px rgba(28, 96, 72, 0.6)); fill-opacity: 0.5; }
+                    100% { filter: drop-shadow(0 0 16px rgba(28, 96, 72, 1)); fill-opacity: 1; stroke-width: 4px; }
+                }
+                
+                /* Glowing Marker on Hover */
+                .glowing-marker {
+                    animation: pulseGlow 1s infinite alternate ease-in-out;
+                    transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
+                }
+
                 /* Fix the ugly square focus ring on map markers */
                 .leaflet-interactive:focus { outline: none !important; }
                 
@@ -4919,58 +4952,80 @@ const InteractiveDemographicMap = memo(() => {
 
       {/* Dynamic Dual Map Legend */}
       {legendInfo && (
-        <div className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-md border border-[#D8D8D8] pointer-events-auto transition-all min-w-[140px]">
-          {/* 1. Demographic Section */}
-          <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mb-2 border-b border-[#D8D8D8] pb-1">
-            {legendInfo.title}
-          </h4>
-          <div className="flex flex-col gap-1.5">
-            {legendInfo.items.map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span
-                  className="w-3 h-3 rounded-sm shadow-sm"
-                  style={{ backgroundColor: item.c }}
-                ></span>
-                <span className="text-[9px] font-bold text-[#4C4A4B]">
-                  {item.l}
-                </span>
+        <div 
+          className={`absolute top-4 right-4 z-[990] bg-white/90 backdrop-blur-md shadow-md border border-[#D8D8D8] pointer-events-auto transition-all ${isLegendOpen ? 'p-3 rounded-xl min-w-[140px] max-w-[170px] sm:max-w-none' : 'px-2.5 py-2 sm:p-2.5 rounded-xl hover:bg-white cursor-pointer'} ${isPanelOpen ? 'hidden sm:block' : ''}`}
+          onClick={() => { if (!isLegendOpen) setIsLegendOpen(true); }}
+        >
+          {!isLegendOpen ? (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-[#1E2F31] font-bold text-[10px] sm:text-xs uppercase tracking-wider">Legend</span>
+              <ChevronDown size={14} className="text-[#1C6048] shrink-0" />
+            </div>
+          ) : (
+            <>
+              <div 
+                className="flex justify-between items-center gap-4 mb-2 border-b border-[#D8D8D8]/50 pb-1 cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLegendOpen(false);
+                }}
+              >
+                <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider">
+                  {legendInfo.title}
+                </h4>
+                <ChevronDown size={14} className="text-[#1E2F31] shrink-0 rotate-180" />
               </div>
-            ))}
-          </div>
 
-          {/* 2. Infrastructure Section */}
-          <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mt-4 mb-2 border-b border-[#D8D8D8] pb-1">
-            Locations
-          </h4>
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <div className="relative w-3 h-3 flex items-center justify-center">
-                <span className="absolute inset-0 rounded-full border border-dashed border-[#1C6048] animate-[spin_10s_linear_infinite]"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1C6048]"></span>
+              {/* 1. Demographic Section */}
+              <div className="flex flex-col gap-1.5 mt-2">
+                {legendInfo.items.map((item, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-sm shadow-sm flex-shrink-0"
+                      style={{ backgroundColor: item.c }}
+                    ></span>
+                    <span className="text-[9px] font-bold text-[#4C4A4B] leading-tight">
+                      {item.l}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <span className="text-[9px] font-bold text-[#4C4A4B]">
-                Vasanta Hub
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full border-2 border-white bg-[#99B6AA] shadow-sm"></span>
-              <span className="text-[9px] font-bold text-[#4C4A4B]">
-                Cancer Hsopitals
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full border-2 border-white bg-[#1E2F31] shadow-sm"></span>
-              <span className="text-[9px] font-bold text-[#4C4A4B]">
-                Class A
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full border-2 border-white bg-[#A95C3E] shadow-sm"></span>
-              <span className="text-[9px] font-bold text-[#4C4A4B]">
-                Class B
-              </span>
-            </div>
-          </div>
+
+              {/* 2. Infrastructure Section */}
+              <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mt-4 mb-2 border-b border-[#D8D8D8] pb-1">
+                Locations
+              </h4>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="relative w-3 h-3 flex items-center justify-center flex-shrink-0">
+                    <span className="absolute inset-0 rounded-full border border-dashed border-[#1C6048] animate-[spin_10s_linear_infinite]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1C6048]"></span>
+                  </div>
+                  <span className="text-[9px] font-bold text-[#4C4A4B] leading-tight flex-1">
+                    Vasanta Hub
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full border-2 border-white bg-[#99B6AA] shadow-sm flex-shrink-0"></span>
+                  <span className="text-[9px] font-bold text-[#4C4A4B] leading-tight flex-1">
+                    Cancer Hospitals
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full border-2 border-white bg-[#1E2F31] shadow-sm flex-shrink-0"></span>
+                  <span className="text-[9px] font-bold text-[#4C4A4B] leading-tight flex-1">
+                    Class A
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full border-2 border-white bg-[#A95C3E] shadow-sm flex-shrink-0"></span>
+                  <span className="text-[9px] font-bold text-[#4C4A4B] leading-tight flex-1">
+                    Class B
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -4984,7 +5039,7 @@ const InteractiveDemographicMap = memo(() => {
       </div>
 
       <div
-        className={`absolute top-4 left-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[320px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-all ${isPanelOpen ? "translate-x-0" : "-translate-x-[120%]"}`}
+        className={`absolute top-4 left-4 z-[1010] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[320px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-all ${isPanelOpen ? "translate-x-0" : "-translate-x-[120%]"}`}
       >
         <div className="p-4 border-b border-[#D8D8D8] flex flex-col gap-3 sticky top-0 bg-white/95 z-10">
           <div className="flex justify-between items-center">
@@ -5167,6 +5222,8 @@ const InteractiveDemographicMap = memo(() => {
                             [groupName]: !p[groupName],
                           }))
                         }
+                        onMouseEnter={() => handleGroupHover(groupLocs, true)}
+                        onMouseLeave={() => handleGroupHover(groupLocs, false)}
                       >
                         <div className="flex items-center gap-1.5">
                           <ChevronDown
@@ -5288,6 +5345,8 @@ const InteractiveDemographicMap = memo(() => {
                                         [subGroupName]: !p[subGroupName],
                                       }))
                                     }
+                                    onMouseEnter={() => handleGroupHover(subGroupLocs, true)}
+                                    onMouseLeave={() => handleGroupHover(subGroupLocs, false)}
                                   >
                                     <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
                                       <ChevronDown
@@ -5334,6 +5393,8 @@ const InteractiveDemographicMap = memo(() => {
                                         [subGroupName]: !p[subGroupName],
                                       }))
                                     }
+                                    onMouseEnter={() => handleGroupHover(subGroupLocs, true)}
+                                    onMouseLeave={() => handleGroupHover(subGroupLocs, false)}
                                   >
                                     <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
                                       <ChevronDown
@@ -5389,6 +5450,8 @@ const InteractiveDemographicMap = memo(() => {
                                                 !p[`${subGroupName}_ClassA`],
                                             }))
                                           }
+                                          onMouseEnter={() => handleGroupHover(subGroupLocs.filter(l => l.tier === 'Class A'), true)}
+                                          onMouseLeave={() => handleGroupHover(subGroupLocs.filter(l => l.tier === 'Class A'), false)}
                                         >
                                           <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
                                             <ChevronDown
@@ -5515,6 +5578,8 @@ const InteractiveDemographicMap = memo(() => {
                                                 !p[`${subGroupName}_ClassB`],
                                             }))
                                           }
+                                          onMouseEnter={() => handleGroupHover(subGroupLocs.filter(l => l.tier === 'Class B'), true)}
+                                          onMouseLeave={() => handleGroupHover(subGroupLocs.filter(l => l.tier === 'Class B'), false)}
                                         >
                                           <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1E2F31] uppercase tracking-widest">
                                             <ChevronDown
@@ -5747,9 +5812,11 @@ const InteractiveDemographicMap = memo(() => {
       {!isPanelOpen && (
         <div
           onClick={() => setIsPanelOpen(true)}
-          className="absolute top-4 left-4 z-[1000] bg-white/90 backdrop-blur-md p-2.5 rounded-xl shadow-md border border-[#D8D8D8] cursor-pointer hover:bg-white text-[#1E2F31] font-bold text-xs uppercase flex items-center gap-2"
+          className="absolute top-4 left-4 z-[950] bg-white/90 backdrop-blur-md px-2.5 py-2 sm:p-2.5 rounded-xl shadow-md border border-[#D8D8D8] cursor-pointer hover:bg-white text-[#1E2F31] font-bold text-[10px] sm:text-xs uppercase flex items-center gap-1.5 sm:gap-2"
         >
-          <Map size={16} className="text-[#1C6048]" /> Open Map Data
+          <Map size={14} className="text-[#1C6048] shrink-0" />
+          <span className="hidden sm:inline">Open Map Data</span>
+          <span className="sm:hidden">Data</span>
         </div>
       )}
       {/* Combined Toolbar (Target & Ruler) matching Leaflet native style */}
@@ -5841,7 +5908,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     <button className="text-[#99B6AA] hover:text-[#1C6048] transition-colors">
                       <Info size={16} />
                     </button>
-                    <div className="absolute top-full left-0 mt-2 w-72 bg-[#1E2F31] text-white text-[10px] p-3 rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 shadow-xl border border-white/10 text-left">
+                    <div className="absolute top-full right-0 md:left-0 md:right-auto mt-2 w-[280px] md:w-72 bg-[#1E2F31] text-white text-[10px] p-3 rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 shadow-xl border border-white/10 text-left">
                       <strong className="text-white block mb-1 pb-1 border-b border-white/20">Sources & Data Validation</strong>
                       <ul className="text-white/80 leading-relaxed font-medium space-y-1.5 mt-2 list-none m-0 p-0">
                         <li>• <strong className="text-[#E8EFEA]">LINAC Waitlist (Kemenkes):</strong> Standard public hospital LINAC routing queues routinely average 3-6 months according to Ministry of Health.</li>
@@ -5904,7 +5971,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                   <button className="text-[#9B8B70] hover:text-[#1E2F31] transition-colors">
                     <Info size={16} />
                   </button>
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-[#1E2F31] text-white text-[10px] p-3 rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 shadow-xl border border-white/10 text-left">
+                  <div className="absolute top-full right-0 md:left-1/2 md:-translate-x-1/2 mt-2 w-[280px] md:w-64 bg-[#1E2F31] text-white text-[10px] p-3 rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 shadow-xl border border-white/10 text-left">
                     <strong className="text-white block mb-1 pb-1 border-b border-white/20">Sources & Validation</strong>
                     <p className="text-white/80 leading-relaxed font-medium mt-2">SES A&B penetration (approx. 18-20% in Greater Jakarta) is estimated by mapping BPS 2024 regional expenditure demographics against Nielsen's SES classification matrix. The high regional GDP per capita strongly correlates with deeper pools of commercial insurance adoption.</p>
                   </div>
@@ -5920,7 +5987,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     1. TAM (Total Catchment)
                   </span>
                   <span className="font-mono text-sm font-black text-[#1E2F31]">
-                    7,400,000
+                    7,379,532
                   </span>
                 </div>
                 <div className="w-full flex justify-center py-0.5">
@@ -5958,10 +6025,10 @@ const StudyView = memo(({ isPresenting, info }) => {
 
             <div className="mt-6 pt-4 border-t border-[#D8D8D8]">
               <p className="text-[10px] text-[#4C4A4B] leading-relaxed font-medium">
-                By filtering the regional demographic to strictly isolate **SES
-                A & B (18%)** and capturing those with **Private Commercial
-                Insurance (40%)**, we establish a core addressable market of
-                **230.4k high-margin premium lives**, heavily de-risking our
+                By filtering the regional demographic to strictly isolate <strong>SES
+                A & B (18%)</strong> and capturing those with <strong>Private Commercial
+                Insurance (40%)</strong>, we establish a core addressable market of
+                <strong>230.4k high-margin premium lives</strong>, heavily de-risking our
                 revenue-per-bed targets.
               </p>
             </div>
@@ -6296,7 +6363,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                       <Cell fill="#9B8B70" />
                       <Cell fill="#294043" />
                     </Pie>
-                    <Tooltip
+                    <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                       cursor={{ fill: "transparent" }}
                       contentStyle={{
                         borderRadius: "8px",
@@ -6319,7 +6386,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     Total Catchment
                   </p>
                   <p className="text-xl font-black text-[#1E2F31] leading-none">
-                    7.4M
+                    7,379,532
                   </p>
                 </div>
                 <div className="flex flex-col justify-between text-center h-full">
@@ -7120,7 +7187,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                       tick={TICK_STYLE}
                       dy={10}
                     />
-                    <Tooltip
+                    <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                       cursor={CHART_CURSOR_STYLE}
                       contentStyle={TOOLTIP_STYLE}
                       formatter={formatCancerCases}
@@ -7183,7 +7250,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                       dy={10}
                     />
                     <YAxis hide domain={["dataMin - 2", "dataMax + 2"]} />
-                    <Tooltip
+                    <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                       contentStyle={TOOLTIP_STYLE}
                       formatter={formatInsuranceTooltip}
                     />
@@ -7417,7 +7484,7 @@ const OpCoDashboardView = memo(
                   axisLine={false}
                   tickFormatter={(val) => `${val}%`}
                 />
-                <Tooltip
+                <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                   contentStyle={TOOLTIP_STYLE}
                   formatter={(val, name) =>
                     formatNumber(val, 1) +
@@ -7501,7 +7568,7 @@ const OpCoDashboardView = memo(
                     axisLine={false}
                     tickFormatter={(val) => `${val}%`}
                   />
-                  <Tooltip
+                  <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                     contentStyle={TOOLTIP_STYLE}
                     formatter={(val) => formatNumber(val, 1) + "%"}
                   />
@@ -7549,7 +7616,7 @@ const OpCoDashboardView = memo(
                     axisLine={false}
                     tickFormatter={(val) => `${val}%`}
                   />
-                  <Tooltip
+                  <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                     contentStyle={TOOLTIP_STYLE}
                     formatter={(val) => formatNumber(val, 1) + "%"}
                   />
@@ -7971,7 +8038,7 @@ const PropCoDashboardView = memo(
                           />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(val) => formatCurrency(val)} />
+                      <Tooltip allowEscapeViewBox={{ x: true, y: true }} formatter={(val) => formatCurrency(val)} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -8153,7 +8220,7 @@ const PropCoDashboardView = memo(
                     axisLine={false}
                     tickFormatter={(val) => `${val}B`}
                   />
-                  <Tooltip
+                  <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                     contentStyle={TOOLTIP_STYLE}
                     formatter={(val) => formatNumber(val, 1) + "B"}
                   />
@@ -8754,7 +8821,7 @@ const ConsolidatedDashboardView = memo(
                   axisLine={false}
                   tickFormatter={(val) => `${val}%`}
                 />
-                <Tooltip
+                <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                   contentStyle={TOOLTIP_STYLE}
                   formatter={(val, name) =>
                     formatNumber(val, 1) + (name.includes("Margin") ? "%" : "B")
@@ -8828,7 +8895,7 @@ const ConsolidatedDashboardView = memo(
                   axisLine={false}
                   tickFormatter={(val) => `${val}B`}
                 />
-                <Tooltip
+                <Tooltip allowEscapeViewBox={{ x: true, y: true }}
                   contentStyle={TOOLTIP_STYLE}
                   formatter={(val) => formatNumber(val, 1) + "B"}
                 />
@@ -11494,7 +11561,7 @@ const MasterTimelineView = memo(({ isPresenting }) => {
               Strategy
             </h3>
             <p className="text-[11px] text-[#4C4A4B] leading-relaxed font-medium">
-              By securing the **BAPETEN Nuclear Licensing** in Phase 2 (Months
+              By securing the <strong>BAPETEN Nuclear Licensing</strong> in Phase 2 (Months
               9-16), we lock in our legal monopoly. Since no general competitor
               in the Tangerang sector holds these permissions, this approval
               protects our oncology revenues even before physical construction
