@@ -3656,7 +3656,7 @@ const mapLocations = [
     desc: "120-Bed Oncology Hub",
     lat: -6.1543,
     lon: 106.7398,
-    color: "#1C6048",
+    color: "#1E3A8A",
     radii: [5000, 10000],
   },
 
@@ -4008,11 +4008,12 @@ const mapLocations = [
   {
     id: "Soekarno-Hatta Airport",
     name: "Soekarno-Hatta Airport",
-    group: "General",
+    group: "Infrastructure",
     desc: "Transit Hub",
     query: "Bandar Udara Internasional Soekarno-Hatta",
     color: "#9b8b70", // Slate gray to distinguish from city demographics
-    fillColor: "#85a58a",
+    fillColor: "#9b8b70",
+    fillOpacity: 0.35,
     population: "Transit Hub",
     density: "N/A",
     hospitals: 1,
@@ -4112,15 +4113,16 @@ const generateFallbackGeoJSON = (centerLat, centerLon, radiusDegrees) => {
 const InteractiveDemographicMap = memo(() => {
   const [leafletReady, setLeafletReady] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("controls"); // controls | analytics
   const [viewMode, setViewMode] = useState("admin");
-  const [pyramidExpanded, setPyramidExpanded] = useState(false);
   const [regionsSectionExpanded, setRegionsSectionExpanded] = useState(true);
   const [poiSectionExpanded, setPoiSectionExpanded] = useState(true);
   const [expandedGroups, setExpandedGroups] = useState({});
   const [expandedPoiGroups, setExpandedPoiGroups] = useState({
-    Vasanta: true,
+    Vasanta: false,
     "Cancer Hospitals": false,
     General: false,
+    Infrastructure: false,
   });
   const [expandedSubGroups, setExpandedSubGroups] = useState({
     "Class A": false,
@@ -4131,6 +4133,7 @@ const InteractiveDemographicMap = memo(() => {
     targetRegions.filter((r) => !r.defaultOff).map((r) => r.id),
   );
   const [showRegionLabels, setShowRegionLabels] = useState(false);
+  const [showTollRoads, setShowTollRoads] = useState(false);
   const [activePOIs, setActivePOIs] = useState(mapLocations.map((l) => l.id));
   const [loadingStatus, setLoadingStatus] = useState({
     active: true,
@@ -4143,6 +4146,7 @@ const InteractiveDemographicMap = memo(() => {
 
   const [isLegendOpen, setIsLegendOpen] = useState(false);
   const mapRef = useRef(null);
+  const tollRoadLayerRef = useRef(null);
   const regionsLayersRef = useRef({});
   const geoJsonCacheRef = useRef({});
   const hoverTooltipRef = useRef(null);
@@ -4239,6 +4243,62 @@ const InteractiveDemographicMap = memo(() => {
     };
   }, [leafletReady]);
 
+  useEffect(() => {
+    if (!mapRef.current) return;
+    
+    if (showTollRoads) {
+      if (!tollRoadLayerRef.current) {
+        setLoadingStatus({ active: true, text: "Loading Toll Roads...", isError: false });
+        // Request overpass data for motorways in the region
+        const query = `[out:json];(way["highway"="motorway"](-6.4,106.5,-6.0,107.0);way["highway"="motorway_link"](-6.4,106.5,-6.0,107.0););out geom;`;
+        fetch("https://overpass-api.de/api/interpreter", {
+          method: "POST",
+          body: "data=" + encodeURIComponent(query),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        })
+          .then(r => r.text())
+          .then(text => {
+            try {
+              return JSON.parse(text);
+            } catch (e) {
+              throw new Error("API rate limited or returned invalid JSON.");
+            }
+          })
+          .then(data => {
+            if (!mapRef.current) return;
+            const lines = [];
+            data.elements.forEach(element => {
+              if (element.type === "way" && element.geometry) {
+                lines.push(element.geometry.map(p => [p.lat, p.lon]));
+              }
+            });
+            
+            tollRoadLayerRef.current = L.polyline(lines, {
+              color: "#1E3A8A",
+              weight: 3,
+              opacity: 0.6,
+              dashArray: "5, 5",
+              pane: "ringsPane"
+            }).addTo(mapRef.current);
+            setLoadingStatus({ active: false, text: "", isError: false });
+          }).catch(e => {
+            console.error("Failed to load toll roads", e);
+            if (!mapRef.current) return;
+            setLoadingStatus({ active: false, text: "Failed to load toll roads", isError: true });
+            setTimeout(() => setLoadingStatus({ active: false, text: "", isError: false }), 3000);
+          });
+      } else {
+        mapRef.current.addLayer(tollRoadLayerRef.current);
+      }
+    } else {
+      if (tollRoadLayerRef.current && mapRef.current.hasLayer(tollRoadLayerRef.current)) {
+        mapRef.current.removeLayer(tollRoadLayerRef.current);
+      }
+    }
+  }, [showTollRoads]);
+
   const setupLayerInteractions = (layer, region, mapInstance) => {
     let lastLatLng = null;
 
@@ -4309,7 +4369,9 @@ const InteractiveDemographicMap = memo(() => {
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(region.query)}&polygon_geojson=1&format=json`,
         );
         if (!response.ok) throw new Error("API Error");
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try { data = JSON.parse(text); } catch(e) { throw new Error("API Limit Reached"); }
 
         let geojsonData;
         if (data && data.length > 0 && data[0].geojson) {
@@ -4427,7 +4489,7 @@ const InteractiveDemographicMap = memo(() => {
           weight: 2,
           dashArray: "4, 4",
           fillColor: loc.color,
-          fillOpacity: 0.1,
+          fillOpacity: loc.fillOpacity !== undefined ? loc.fillOpacity : 0.1,
           interactive: false,
           pane: "ringsPane",
         }).addTo(singlePoiGroup);
@@ -4440,7 +4502,9 @@ const InteractiveDemographicMap = memo(() => {
             `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc.query)}&polygon_geojson=1&format=json`,
           );
           if (!response.ok) throw new Error("API Error");
-          const data = await response.json();
+          const text = await response.text();
+          let data;
+          try { data = JSON.parse(text); } catch(e) { throw new Error("API Limit Reached"); }
 
           let geojsonData;
           if (data && data.length > 0 && data[0].geojson) {
@@ -4458,7 +4522,7 @@ const InteractiveDemographicMap = memo(() => {
             weight: 2,
             dashArray: "4, 4",
             fillColor: loc.fillColor || loc.color,
-            fillOpacity: 0.1,
+            fillOpacity: loc.fillOpacity !== undefined ? loc.fillOpacity : 0.1,
             interactive: false,
             pane: "ringsPane",
           }).addTo(singlePoiGroup);
@@ -4473,7 +4537,7 @@ const InteractiveDemographicMap = memo(() => {
             weight: 2,
             dashArray: "4, 4",
             fillColor: loc.fillColor || loc.color,
-            fillOpacity: 0.1,
+            fillOpacity: loc.fillOpacity !== undefined ? loc.fillOpacity : 0.1,
             interactive: false,
             pane: "ringsPane",
           }).addTo(singlePoiGroup);
@@ -4499,15 +4563,31 @@ const InteractiveDemographicMap = memo(() => {
           });
       }
 
-      const marker = L.circleMarker([lat, lon], {
-        radius: 8,
-        fillColor: loc.color,
-        color: "#EFEBE7",
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 1,
-        pane: "markersPane",
-      }).addTo(singlePoiGroup);
+      let marker;
+      if (loc.id === "Soekarno-Hatta Airport") {
+        const iconHtml = `<div style="background-color: ${loc.color}; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #EFEBE7; color: white;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.6L3 8l6 5-3.5 3.5-2.5-.5L2 17l4 4 1-.5-.5-2.5 3.5-3.5 5 6 1.2-.7.6-1.1c.4-.2.7-.6.6-1.1Z"/></svg>
+        </div>`;
+        marker = L.marker([lat, lon], {
+          icon: L.divIcon({
+            html: iconHtml,
+            className: "",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          }),
+          pane: "markersPane"
+        }).addTo(singlePoiGroup);
+      } else {
+        marker = L.circleMarker([lat, lon], {
+          radius: 8,
+          fillColor: loc.color,
+          color: "#EFEBE7",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 1,
+          pane: "markersPane",
+        }).addTo(singlePoiGroup);
+      }
 
       marker.bindTooltip(
         `<b>${loc.name}</b><br><span style="font-size:11px;color:#777;">${loc.desc || loc.population || ""}</span>`,
@@ -4620,7 +4700,9 @@ const InteractiveDemographicMap = memo(() => {
       if (prevLayer) {
         prevLayer.eachLayer((layer) => {
           if (layer.options && layer.options.pane === "markersPane") {
-            layer.setStyle({ className: "" });
+            if (typeof layer.setStyle === 'function') {
+              layer.setStyle({ className: "" });
+            }
             const el = typeof layer.getElement === 'function' ? layer.getElement() : null;
             if (el) el.classList.remove("glowing-marker");
           }
@@ -4633,12 +4715,14 @@ const InteractiveDemographicMap = memo(() => {
       layerGroup.eachLayer((layer) => {
         if (layer.options && layer.options.pane === "markersPane") {
           const isGlowing = isHovering || activeClickedPoiRef.current === id;
-          layer.setStyle({
-            className: isGlowing ? "glowing-marker" : "",
-            radius: 8,
-            weight: 2,
-            opacity: 1,
-          });
+          if (typeof layer.setStyle === 'function') {
+            layer.setStyle({
+              className: isGlowing ? "glowing-marker" : "",
+              radius: 8,
+              weight: 2,
+              opacity: 1,
+            });
+          }
           const el = typeof layer.getElement === 'function' ? layer.getElement() : null;
           if (el) {
             if (isGlowing) el.classList.add("glowing-marker");
@@ -4917,8 +5001,8 @@ const InteractiveDemographicMap = memo(() => {
                 }
                 
                 @keyframes pulseGlow {
-                    0% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)); fill-opacity: 0.8; }
-                    100% { filter: drop-shadow(0 0 24px rgba(255, 255, 255, 1)); fill-opacity: 1; stroke-width: 5px; }
+                    0% { filter: drop-shadow(0 0 8px rgba(30, 58, 138, 0.9)); fill-opacity: 0.9; }
+                    100% { filter: drop-shadow(0 0 24px rgba(30, 58, 138, 1)); fill-opacity: 1; stroke-width: 5px; }
                 }
                 
                 /* Glowing Marker on Hover */
@@ -5009,7 +5093,7 @@ const InteractiveDemographicMap = memo(() => {
       {legendInfo && !isLegendOpen && (
         <div
           onClick={() => setIsLegendOpen(true)}
-          className={`absolute top-4 right-4 z-[950] bg-white/90 backdrop-blur-md px-2.5 py-2 sm:p-2.5 rounded-xl shadow-md border border-[#D8D8D8] cursor-pointer hover:bg-white text-[#1E2F31] font-bold text-[10px] sm:text-xs uppercase flex items-center gap-1.5 sm:gap-2 ${isPanelOpen ? 'hidden sm:flex' : 'flex'}`}
+          className={`absolute top-4 right-4 z-[950] bg-white/90 backdrop-blur-md px-2.5 py-2 sm:p-2.5 rounded-xl shadow-md border border-[#D8D8D8] cursor-pointer hover:bg-white text-[#1E2F31] font-bold text-[10px] sm:text-xs uppercase flex items-center gap-1.5 sm:gap-2 transition-all duration-300 flex`}
         >
           <span className="hidden sm:inline">Legend</span>
           <span className="sm:hidden">Legend</span>
@@ -5019,31 +5103,34 @@ const InteractiveDemographicMap = memo(() => {
 
       {legendInfo && (
         <div
-          className={`absolute top-4 right-4 z-[1010] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[240px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-transform duration-300 ${isLegendOpen ? "translate-x-0" : "translate-x-[120%]"}`}
+          className={`absolute top-4 right-4 z-[1010] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[180px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-all duration-300 ${isLegendOpen ? "translate-x-0" : "translate-x-[120%]"}`}
         >
-          <div className="p-4 border-b border-[#D8D8D8] flex justify-between items-center sticky top-0 bg-white/95 z-10">
-            <h4 className="text-[12px] font-extrabold text-[#1E2F31] uppercase tracking-wider">
-              {legendInfo.title}
+          <div className="p-3 border-b border-[#D8D8D8] flex justify-between items-center sticky top-0 bg-white/95 z-10">
+            <h4 className="text-[11px] font-extrabold text-[#1E2F31] uppercase tracking-wider">
+              Legend
             </h4>
             <button
               onClick={() => setIsLegendOpen(false)}
-              className="text-[#4C4A4B] hover:bg-[#EFEBE7] p-1.5 rounded-lg transition-colors flex items-center justify-center"
+              className="text-[#4C4A4B] hover:bg-[#EFEBE7] p-1 rounded-lg transition-colors flex items-center justify-center"
               title="Close Panel"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={16} />
             </button>
           </div>
           
-          <div className="p-4 flex flex-col">
+          <div className="p-3 flex flex-col">
             {/* 1. Demographic Section */}
-            <div className="flex flex-col gap-2.5 mb-6">
+            <h4 className="text-[9px] font-bold text-[#9B8B70] uppercase tracking-wider mb-2">
+              {legendInfo.title}
+            </h4>
+            <div className="flex flex-col gap-2 mb-5">
               {legendInfo.items.map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
+                <div key={i} className="flex items-center gap-2">
                   <span
-                    className="w-4 h-4 rounded-sm shadow-sm flex-shrink-0"
+                    className="w-3.5 h-3.5 rounded-sm shadow-sm flex-shrink-0"
                     style={{ backgroundColor: item.c }}
                   ></span>
-                  <span className="text-[11px] font-bold text-[#4C4A4B] leading-tight">
+                  <span className="text-[10px] font-bold text-[#4C4A4B] leading-tight">
                     {item.l}
                   </span>
                 </div>
@@ -5051,34 +5138,34 @@ const InteractiveDemographicMap = memo(() => {
             </div>
 
             {/* 2. Infrastructure Section */}
-            <h4 className="text-[10px] font-bold text-[#9B8B70] uppercase tracking-wider mb-3">
+            <h4 className="text-[9px] font-bold text-[#9B8B70] uppercase tracking-wider mb-2">
               Locations
             </h4>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3">
-                <div className="relative w-4 h-4 flex items-center justify-center flex-shrink-0">
-                  <span className="absolute inset-0 rounded-full border border-dashed border-[#1C6048] animate-[spin_10s_linear_infinite]"></span>
-                  <span className="w-2 h-2 rounded-full bg-[#1C6048]"></span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <div className="relative w-3.5 h-3.5 flex items-center justify-center flex-shrink-0">
+                  <span className="absolute inset-0 rounded-full border border-dashed border-[#1E3A8A] animate-[spin_10s_linear_infinite]"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A]"></span>
                 </div>
-                <span className="text-[11px] font-bold text-[#4C4A4B] leading-tight flex-1">
+                <span className="text-[10px] font-bold text-[#4C4A4B] leading-tight flex-1">
                   Vasanta Hub
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="w-4 h-4 rounded-full border-2 border-white bg-[#99B6AA] shadow-sm flex-shrink-0"></span>
-                <span className="text-[11px] font-bold text-[#4C4A4B] leading-tight flex-1">
+              <div className="flex items-center gap-2">
+                <span className="w-3.5 h-3.5 rounded-full border-2 border-white bg-[#99B6AA] shadow-sm flex-shrink-0"></span>
+                <span className="text-[10px] font-bold text-[#4C4A4B] leading-tight flex-1">
                   Cancer Hospitals
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="w-4 h-4 rounded-full border-2 border-white bg-[#1E2F31] shadow-sm flex-shrink-0"></span>
-                <span className="text-[11px] font-bold text-[#4C4A4B] leading-tight flex-1">
+              <div className="flex items-center gap-2">
+                <span className="w-3.5 h-3.5 rounded-full border-2 border-white bg-[#1E2F31] shadow-sm flex-shrink-0"></span>
+                <span className="text-[10px] font-bold text-[#4C4A4B] leading-tight flex-1">
                   Class A
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="w-4 h-4 rounded-full border-2 border-white bg-[#A95C3E] shadow-sm flex-shrink-0"></span>
-                <span className="text-[11px] font-bold text-[#4C4A4B] leading-tight flex-1">
+              <div className="flex items-center gap-2">
+                <span className="w-3.5 h-3.5 rounded-full border-2 border-white bg-[#A95C3E] shadow-sm flex-shrink-0"></span>
+                <span className="text-[10px] font-bold text-[#4C4A4B] leading-tight flex-1">
                   Class B
                 </span>
               </div>
@@ -5097,13 +5184,13 @@ const InteractiveDemographicMap = memo(() => {
       </div>
 
       <div
-        className={`absolute top-4 left-4 z-[1010] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[320px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-all ${isPanelOpen ? "translate-x-0" : "-translate-x-[120%]"}`}
+        className={`absolute top-4 left-4 z-[1010] bg-white/95 backdrop-blur-md border border-[#D8D8D8] rounded-xl shadow-lg w-[calc(100%-32px)] sm:w-[320px] max-h-[calc(100%-110px)] overflow-y-auto custom-scrollbar flex flex-col pointer-events-auto transition-all duration-300 ${isPanelOpen ? "translate-x-0" : "-translate-x-[120%]"}`}
       >
         <div className="p-4 border-b border-[#D8D8D8] flex flex-col gap-3 sticky top-0 bg-white/95 z-10">
           <div className="flex justify-between items-center">
             <div className="text-sm font-extrabold text-[#1E2f31] uppercase tracking-wider flex items-center gap-2">
               <Map size={16} className="text-[#1C6048]" />{" "}
-              <span>Geo-Demographics</span>
+              <span>Overview Map</span>
             </div>
             <button
               onClick={() => setIsPanelOpen(false)}
@@ -5112,10 +5199,28 @@ const InteractiveDemographicMap = memo(() => {
               <X size={16} />
             </button>
           </div>
-          {/* Master Label Toggle */}
+          
+          <div className="flex bg-[#F9F8F6] p-1 rounded-lg">
+            <button
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${activeTab === 'controls' ? 'bg-white text-[#1C6048] shadow-sm' : 'text-[#8A8175] hover:text-[#1E2F31]'}`}
+              onClick={() => setActiveTab('controls')}
+            >
+              Layers
+            </button>
+            <button
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${activeTab === 'analytics' ? 'bg-white text-[#1C6048] shadow-sm' : 'text-[#8A8175] hover:text-[#1E2F31]'}`}
+              onClick={() => setActiveTab('analytics')}
+            >
+              Age-Gender
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'controls' && (
+        <div className="p-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <span className="text-[8px] font-bold text-[#8A8175] uppercase tracking-wider">
-              Labels
+            <span className="text-[10px] font-bold text-[#8A8175] uppercase tracking-wider">
+              Show Labels
             </span>
             <label className="switch item">
               <input
@@ -5126,9 +5231,7 @@ const InteractiveDemographicMap = memo(() => {
               <span className="slider"></span>
             </label>
           </div>
-        </div>
-
-        <div className="p-4 flex flex-col gap-5">
+          
           <select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
@@ -5142,7 +5245,7 @@ const InteractiveDemographicMap = memo(() => {
             <option value="age">Age Demographics (Median)</option>
           </select>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             <div
               className="flex justify-between items-center text-[11px] font-extrabold text-[#1C6048] uppercase tracking-wider pb-1 border-b border-dashed border-[#d8d8d8] cursor-pointer"
               onClick={() => setRegionsSectionExpanded(!regionsSectionExpanded)}
@@ -5159,10 +5262,10 @@ const InteractiveDemographicMap = memo(() => {
               Object.entries(regionGroups).map(([groupName, regions]) => (
                 <div
                   key={groupName}
-                  className={`flex flex-col transition-all ${expandedGroups[groupName] ? "mb-2" : ""}`}
+                  className={`flex flex-col transition-all`}
                 >
                   <div
-                    className={`flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer transition-all ${expandedGroups[groupName] ? "mb-1" : ""}`}
+                    className={`flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer transition-all`}
                     onClick={() =>
                       setExpandedGroups((p) => ({
                         ...p,
@@ -5259,8 +5362,8 @@ const InteractiveDemographicMap = memo(() => {
               </label>
             </div>
             {poiSectionExpanded && (
-              <div className="flex flex-col mt-1">
-                {["Vasanta", "Cancer Hospitals", "General"].map((groupName) => {
+              <div className="flex flex-col">
+                {["Vasanta", "Cancer Hospitals", "General", "Infrastructure"].map((groupName) => {
                   const groupLocs = mapLocations.filter(
                     (loc) => loc.group === groupName,
                   );
@@ -5269,11 +5372,11 @@ const InteractiveDemographicMap = memo(() => {
                   return (
                     <div
                       key={groupName}
-                      className={`flex flex-col transition-all ${expandedPoiGroups[groupName] ? "mb-2" : ""}`}
+                      className={`flex flex-col transition-all`}
                     >
                       {/* TIER 1: The Main Group Header */}
                       <div
-                        className={`flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer transition-all ${expandedPoiGroups[groupName] ? "mb-1" : ""}`}
+                        className={`flex justify-between items-center text-[10px] font-bold text-[#9B8B70] uppercase py-1 bg-[#F9F8F6] px-2 rounded cursor-pointer transition-all`}
                         onClick={() =>
                           setExpandedPoiGroups((p) => ({
                             ...p,
@@ -5752,6 +5855,32 @@ const InteractiveDemographicMap = memo(() => {
                               </div>
                             );
                           })}
+
+                          {/* Toll Roads Toggle specifically for Infrastructure Group */}
+                          {groupName === "Infrastructure" && (
+                            <div className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors"
+                                 onClick={() => setShowTollRoads(!showTollRoads)}
+                            >
+                              <div className="truncate flex-1 min-w-0 pr-3 relative pl-4">
+                                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 h-0.5 bg-[#1E3A8A]"></span>
+                                <span className="font-bold text-[#1E2F31] group-hover:text-[#1E3A8A]">
+                                  Toll Roads Network
+                                </span>
+                              </div>
+                              <label
+                                className="switch item"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={showTollRoads}
+                                  onChange={() => setShowTollRoads(!showTollRoads)}
+                                />
+                                <span className="slider"></span>
+                              </label>
+                            </div>
+                          )}
+
                         </div>
                       )}
                     </div>
@@ -5760,28 +5889,22 @@ const InteractiveDemographicMap = memo(() => {
               </div>
             )}
           </div>
+        </div>
+        )}
 
-          <div className="bg-[#F9F8F6] p-3 rounded-xl border border-[#D8D8D8]">
-            <div
-              className="flex justify-between items-center cursor-pointer mb-2"
-              onClick={() => setPyramidExpanded(!pyramidExpanded)}
-            >
-              <div>
-                <span className="text-[11px] font-extrabold text-[#1C6048] uppercase tracking-wider">
-                  Demographics
-                </span>
-                <p className="text-[9px] font-medium text-[#4C4A4B]">
-                  {pyramidData.activePop.toLocaleString()} Captured
-                </p>
-              </div>
-              <ChevronDown
-                size={14}
-                className={`text-[#1C6048] transition-transform ${!pyramidExpanded ? "-rotate-90" : ""}`}
-              />
+        {activeTab === 'analytics' && (
+        <div className="p-4 flex flex-col gap-4 overflow-y-auto custom-scrollbar flex-1">
+            <div className="border-b border-[#D8D8D8] pb-3 mb-1">
+              <span className="text-[11px] font-extrabold text-[#1E2F31] uppercase tracking-wider flex items-center gap-2">
+                <BarChart3 size={14} className="text-[#1C6048]" />
+                Target Capture
+              </span>
+              <p className="text-[10px] font-medium text-[#4C4A4B] mt-1">
+                {pyramidData.activePop.toLocaleString()} individuals in selected regions.
+              </p>
             </div>
-            <div
-              className={`mt-2 pt-2 border-t border-[#D8D8D8] flex flex-col gap-1 transition-all duration-400 origin-top-left ${!pyramidExpanded ? "scale-y-[0.3] scale-x-[0.3] -mb-[180px] opacity-60 grayscale-[0.5] pointer-events-none" : ""}`}
-            >
+
+            <div className="flex flex-col gap-1">
               {ageCohorts.map((cohort, index) => (
                 <div key={cohort} className="flex items-center h-3">
                   <div className="flex-1 h-full bg-[#EFEBE7] rounded-sm flex justify-end">
@@ -5835,7 +5958,7 @@ const InteractiveDemographicMap = memo(() => {
                 </div>
               </div>
 
-              <div className="flex justify-between text-[9px] font-bold text-[#9B8B70] border-t border-dashed border-[#D8D8D8] pt-2">
+              <div className="flex justify-between text-[9px] font-bold text-[#9B8B70] border-t border-dashed border-[#D8D8D8] pt-2 mb-2">
                 <span className="text-[#1C6048]">♂ Men</span>
                 <span>Cohort Age</span>
                 <span className="text-[#A95C3E]">♀ Women</span>
@@ -5864,8 +5987,8 @@ const InteractiveDemographicMap = memo(() => {
                 </div>
               </div>
             </div>
-          </div>
         </div>
+        )}
       </div>
 
       {!isPanelOpen && (
@@ -5916,7 +6039,7 @@ const StudyView = memo(({ isPresenting, info }) => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Navigation Bar for Study */}
-      <div className={`w-full ${isPresenting ? '' : 'flex justify-center sm:justify-start'}`}>
+      <div className={`w-full flex justify-center`}>
         <div
           className={`flex p-1.5 rounded-2xl border border-[#D8D8D8] w-fit overflow-x-auto max-w-full transition-all ${
             isPresenting
@@ -5926,13 +6049,13 @@ const StudyView = memo(({ isPresenting, info }) => {
         >
           <button
             onClick={() => setActiveMiniTab("marketAnalysis")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "marketAnalysis" ? "bg-[#1E2F31] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "marketAnalysis" ? "bg-[#1C6048] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
           >
             <Search size={16} /> Market Analysis
           </button>
           <button
             onClick={() => setActiveMiniTab("opportunities")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "opportunities" ? "bg-[#1C6048] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "opportunities" ? "bg-[#1e2f31] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
           >
             <Target size={16} /> Opportunities
           </button>
@@ -12344,15 +12467,16 @@ export default function App() {
       >
         {/* FINANCIALS SUB-NAVIGATION (Matches Study Tab Style) */}
         {activeGroup === "financials" && (
-          <div
-            className={`flex p-1.5 gap-1 rounded-2xl border border-[#D8D8D8] w-fit overflow-x-auto max-w-full transition-all ${
-              isPresenting
-                ? "bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(30,47,49,0.15)] fixed bottom-[100px] left-1/2 -translate-x-1/2 z-[105]"
-                : "bg-white shadow-sm mb-6 relative z-10"
-            }`}
-          >
-            <button
-              onClick={() => setActiveTab("dashboard")}
+          <div className="w-full flex justify-center">
+            <div
+              className={`flex p-1.5 gap-1 rounded-2xl border border-[#D8D8D8] w-fit overflow-x-auto max-w-full transition-all ${
+                isPresenting
+                  ? "bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(30,47,49,0.15)] fixed bottom-[100px] left-1/2 -translate-x-1/2 z-[105]"
+                  : "bg-white shadow-sm mb-6 relative z-10"
+              }`}
+            >
+              <button
+                onClick={() => setActiveTab("dashboard")}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeTab === "dashboard" ? "bg-[#1C6048] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
             >
               <LayoutDashboard size={16} /> Dashboard
@@ -12385,6 +12509,7 @@ export default function App() {
               <AIMicroscopeIcon size={16} /> AI Audit
             </button>
           </div>
+         </div>
         )}
 
         {activeTab === "overview" && (
