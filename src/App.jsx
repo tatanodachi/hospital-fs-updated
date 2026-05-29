@@ -4940,7 +4940,7 @@ const InteractiveDemographicMap = memo(() => {
 
           {/* 2. Infrastructure Section */}
           <h4 className="text-[10px] font-extrabold text-[#1E2F31] uppercase tracking-wider mt-4 mb-2 border-b border-[#D8D8D8] pb-1">
-            Infrastructure
+            Locations
           </h4>
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
@@ -5826,114 +5826,67 @@ const StudyView = memo(({ isPresenting, info }) => {
       {/* Dynamic Content Rendering */}
       {activeMiniTab === "macro" && (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in fade-in zoom-in-95 duration-300">
-          {/* Concept 2: Travel-Time & Tech Availability Radar */}
+          {/* Radiation Queues & Waitlist Capture (Replaced Travel-Time Moat) */}
           <BentoBox
             colSpan="md:col-span-12 lg:col-span-7"
             className="bg-white border-[#D8D8D8]"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <MapPin size={24} className="text-[#1C6048]" />
-              <div>
-                <h2 className="text-lg font-black text-[#1E2F31] tracking-tight">
-                  Travel-Time Moat & Capability Radar
-                </h2>
-                <p className="text-[10px] text-[#4C4A4B] font-medium mt-0.5">
-                  Physical travel friction to nearest specialized oncology
-                  facilities.
-                </p>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Timer size={24} className="text-[#1C6048]" />
+                <div className="flex items-start gap-2">
+                  <div>
+                    <h2 className="text-lg font-black text-[#1E2F31] tracking-tight">
+                      Radiation Queues & Waitlist Capture
+                    </h2>
+                    <p className="text-[10px] text-[#4C4A4B] font-medium mt-0.5">
+                      Bridging the gap between diagnosis and LINAC therapy
+                    </p>
+                  </div>
+                  <div className="relative group mt-0.5">
+                    <button className="text-[#99B6AA] hover:text-[#1C6048] transition-colors">
+                      <Info size={16} />
+                    </button>
+                    <div className="absolute top-full left-0 mt-2 w-72 bg-[#1E2F31] text-white text-[10px] p-3 rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 shadow-xl border border-white/10 text-left">
+                      <strong className="text-white block mb-1 pb-1 border-b border-white/20">Sources & Data Validation</strong>
+                      <ul className="text-white/80 leading-relaxed font-medium space-y-1.5 mt-2 list-none m-0 p-0">
+                        <li>• <strong className="text-[#E8EFEA]">LINAC Waitlist (Kemenkes):</strong> Standard public hospital LINAC routing queues routinely average 3-6 months according to Ministry of Health.</li>
+                        <li>• <strong className="text-[#E8EFEA]">PET-CT Deficit (WHO):</strong> WHO recommends 1 PET-CT device per 1 million people; Indonesia operates far below this, driving multi-month nationwide staging delays.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-8 items-center flex-1">
-              {/* Concentric Radar Visualization */}
-              <div className="relative w-48 h-48 flex items-center justify-center shrink-0 bg-[#F9F8F6] rounded-full border border-[#D8D8D8]">
-                {/* Outer/Outflow Limit Ring */}
-                <div className="absolute w-44 h-44 rounded-full border border-dashed border-[#9B8B70]/30 bg-[#9B8B70]/5 flex items-center justify-center animate-[spin_40s_linear_infinite]"></div>
-                {/* Competitor Buffer Ring */}
-                <div className="absolute w-32 h-32 rounded-full border border-[#99B6AA]/40 bg-[#99B6AA]/5 flex items-center justify-center"></div>
-                {/* Vasanta Local Capture Ring */}
-                <div className="absolute w-20 h-20 rounded-full border-2 border-[#1C6048]/40 bg-[#1C6048]/10 flex items-center justify-center">
-                  {/* Vasanta Central Beacon */}
-                  <div className="w-3 h-3 bg-[#1C6048] rounded-full shadow-[0_0_12px_rgba(28,96,72,0.8)] z-10 relative">
-                    <div className="absolute inset-0 rounded-full bg-[#1C6048] animate-ping opacity-70"></div>
-                  </div>
-                </div>
-                {/* Compass Lines */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15">
-                  <div className="w-full h-px bg-[#1E2F31]"></div>
-                  <div className="h-full w-px bg-[#1E2F31] absolute"></div>
-                </div>
-                {/* Ring Labels */}
-                <span className="absolute top-2 text-[8px] font-bold text-[#9B8B70] uppercase">
-                  Overseas Outflow
-                </span>
-                <span className="absolute top-10 text-[8px] font-bold text-[#99B6AA] uppercase">
-                  10km (Secondary)
-                </span>
-                <span className="absolute top-16 text-[8px] font-bold text-[#1C6048] uppercase">
-                  5km (Primary)
-                </span>
-              </div>
-
-              {/* Zone Cards */}
-              <div className="flex-1 space-y-2.5 w-full">
-                <div className="p-3 bg-[#E8EFEA] border border-[#1C6048]/30 rounded-xl flex justify-between items-center transition-transform hover:-translate-y-0.5">
-                  <div>
-                    <p className="text-[10px] font-black text-[#1C6048] uppercase tracking-widest">
-                      Primary Catchment (0–5km / &lt;15 mins)
-                    </p>
-                    <p className="text-[10px] font-medium text-[#4C4A4B] mt-0.5">
-                      Local monopoly zone. Immediate access to daily therapy
-                      cycles.
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-xs text-[#1E2F31]">
-                      PET-CT + LINAC
-                    </p>
-                    <p className="text-[8px] font-bold text-[#1C6048] uppercase">
-                      Immediate Access
-                    </p>
-                  </div>
-                </div>
-                <div className="p-3 bg-[#F9F8F6] border border-[#99B6AA]/30 rounded-xl flex justify-between items-center transition-transform hover:-translate-y-0.5">
-                  <div>
-                    <p className="text-[10px] font-black text-[#1E2F31] uppercase tracking-widest">
-                      Secondary Catchment (5–10km / &lt;45 mins)
-                    </p>
-                    <p className="text-[10px] font-medium text-[#4C4A4B] mt-0.5">
-                      Includes high-growth corridors. Competitive commute
-                      advantage over Jakarta.
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-xs text-[#4C4A4B]">
-                      LINAC Only
-                    </p>
-                    <p className="text-[8px] font-bold text-[#9B8B70] uppercase">
-                      Strategic Inroad
-                    </p>
-                  </div>
-                </div>
-                <div className="p-3 bg-[#F9F8F6] border border-[#9B8B70]/30 rounded-xl flex justify-between items-center transition-transform hover:-translate-y-0.5">
-                  <div>
-                    <p className="text-[10px] font-black text-[#9B8B70] uppercase tracking-widest">
-                      Regional Leakage (4+ hrs flight)
-                    </p>
-                    <p className="text-[10px] font-medium text-[#4C4A4B] mt-0.5">
-                      Outflow to Singapore/Malaysia due to domestic shortages.
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-xs text-[#4C4A4B]">
-                      Premium Care
-                    </p>
-                    <p className="text-[8px] font-bold text-[#9B8B70] uppercase">
-                      USD $11.5B Flight
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div className="p-5 bg-white border border-[#1C6048]/20 rounded-xl flex flex-col items-start gap-4 transition-transform hover:-translate-y-0.5 shadow-sm">
+                 <div className="bg-[#E8EFEA] p-3 rounded-xl shrink-0">
+                   <ShieldAlert className="text-[#1C6048]" size={24} />
+                 </div>
+                 <div>
+                   <p className="text-sm font-bold text-[#1E2F31] mb-2 tracking-wide leading-tight">National Waitlist Overflow</p>
+                   <p className="text-xs text-[#4C4A4B] font-medium leading-relaxed">Public reference hospitals currently experience 3-6 month backlogs for LINAC radiotherapy. Vasanta targets these immediate "spill-over" patients who require urgent intervention and possess private insurance or self-pay capability.</p>
+                 </div>
+               </div>
+               <div className="p-5 bg-white border border-[#D8D8D8] rounded-xl flex flex-col items-start gap-4 transition-transform hover:-translate-y-0.5 shadow-sm">
+                 <div className="bg-[#F9F8F6] p-3 rounded-xl shrink-0">
+                   <Zap className="text-[#9B8B70]" size={24} />
+                 </div>
+                 <div>
+                   <p className="text-sm font-bold text-[#1E2F31] mb-2 tracking-wide leading-tight">Speed-to-Therapy</p>
+                   <p className="text-xs text-[#4C4A4B] font-medium leading-relaxed">For oncology outpatients, treatment velocity is the ultimate differentiator. The facility is structured to cut diagnostic-to-radiation intervals from months down to a matter of days.</p>
+                 </div>
+               </div>
+               <div className="p-5 bg-white border border-[#D8D8D8] rounded-xl flex flex-col items-start gap-4 transition-transform hover:-translate-y-0.5 shadow-sm">
+                 <div className="bg-[#F9F8F6] p-3 rounded-xl shrink-0">
+                   <CheckCircle2 className="text-[#1C6048]" size={24} />
+                 </div>
+                 <div>
+                   <p className="text-sm font-bold text-[#1E2F31] mb-2 tracking-wide leading-tight">Private Sector Absorption</p>
+                   <p className="text-xs text-[#4C4A4B] font-medium leading-relaxed">Class B general hospitals often lack capital-intensive dedicated radiotherapy bunkers. Vasanta will serve as the natural secondary referral hub for cancer patients diagnosed at surrounding middle-tier hospitals.</p>
+                 </div>
+               </div>
             </div>
           </BentoBox>
 
@@ -5942,15 +5895,26 @@ const StudyView = memo(({ isPresenting, info }) => {
             colSpan="md:col-span-12 lg:col-span-5"
             className="bg-[#EFEBE7] border-transparent"
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-start gap-3 mb-6">
               <Users size={24} className="text-[#9B8B70]" />
-              <div>
-                <h2 className="text-lg font-black text-[#1E2F31] tracking-tight">
-                  Premium Market Funnel
-                </h2>
-                <p className="text-[10px] text-[#4C4A4B] font-medium mt-0.5">
-                  Isolating self-pay and private insurance lives (SES A & B).
-                </p>
+              <div className="flex items-start gap-2">
+                <div>
+                  <h2 className="text-lg font-black text-[#1E2F31] tracking-tight">
+                    Premium Market Funnel
+                  </h2>
+                  <p className="text-[10px] text-[#4C4A4B] font-medium mt-0.5">
+                    Isolating self-pay and private insurance lives (SES A & B).
+                  </p>
+                </div>
+                <div className="relative group mt-0.5">
+                  <button className="text-[#9B8B70] hover:text-[#1E2F31] transition-colors">
+                    <Info size={16} />
+                  </button>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-[#1E2F31] text-white text-[10px] p-3 rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all z-50 shadow-xl border border-white/10 text-left">
+                    <strong className="text-white block mb-1 pb-1 border-b border-white/20">Sources & Validation</strong>
+                    <p className="text-white/80 leading-relaxed font-medium mt-2">SES A&B penetration (approx. 18-20% in Greater Jakarta) is estimated by mapping BPS 2024 regional expenditure demographics against Nielsen's SES classification matrix. The high regional GDP per capita strongly correlates with deeper pools of commercial insurance adoption.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -5962,7 +5926,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     1. TAM (Total Catchment)
                   </span>
                   <span className="font-mono text-sm font-black text-[#1E2F31]">
-                    3,200,000
+                    7,400,000
                   </span>
                 </div>
                 <div className="w-full flex justify-center py-0.5">
@@ -5977,7 +5941,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     2. SAM (SES A & B - 18%)
                   </span>
                   <span className="font-mono text-sm font-black text-[#1E2F31]">
-                    576,000
+                    1,332,000
                   </span>
                 </div>
                 <div className="w-full flex justify-center py-0.5">
@@ -5992,7 +5956,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     3. SOM (Insured Target - 40%)
                   </span>
                   <span className="font-mono text-sm font-black text-white">
-                    230,400
+                    532,800
                   </span>
                 </div>
               </div>
@@ -6347,7 +6311,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     Total Catchment
                   </p>
                   <p className="text-xl font-black text-[#1E2F31] leading-none">
-                    3.2M
+                    7.4M
                   </p>
                 </div>
                 <div className="flex flex-col justify-between text-center h-full">
@@ -6355,7 +6319,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                     SES A & B
                   </p>
                   <p className="text-xl font-black text-[#9B8B70] leading-none">
-                    576k
+                    1.33M
                   </p>
                 </div>
               </div>
@@ -6375,13 +6339,13 @@ const StudyView = memo(({ isPresenting, info }) => {
               <div className="w-full h-px bg-[#D8D8D8]"></div>
               <div>
                 <p className="text-[10px] font-bold text-[#1C6048] uppercase tracking-widest mb-1">
-                  Deriving 576k Lives
+                  Deriving 1.33M Lives
                 </p>
                 <p className="text-[10px] text-[#4C4A4B] leading-relaxed font-medium">
                   Calculated directly by capturing exactly{" "}
                   <strong className="text-[#1E2F31]">18%</strong> of the{" "}
-                  <strong className="text-[#1E2F31]">3.2 Million</strong> total
-                  regional catchment population.
+                  <strong className="text-[#1E2F31]">7.4 Million</strong> combined
+                  West, Central, North Jakarta & Tangerang catchment.
                 </p>
               </div>
             </div>
