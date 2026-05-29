@@ -12206,16 +12206,16 @@ export default function App() {
       onMouseUp={handleTextSelection}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&family=League+Spartan:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700;800&display=swap');
         
-        /* Modern, crisp UI font optimized for dense dashboards */
+        /* Modern, geometric UI font for general text */
         .font-sans { 
-            font-family: 'Plus Jakarta Sans', sans-serif !important; 
+            font-family: 'Jost', sans-serif !important; 
         }
         
-        /* Premium institutional serif for logos and headers */
+        /* Bold, geometric and impactful font for headers replacing the old serif */
         .font-serif { 
-            font-family: 'Playfair Display', serif !important; 
+            font-family: 'League Spartan', sans-serif !important; 
         }
         
         /* True monospaced font for perfect vertical alignment in financial tables */
