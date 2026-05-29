@@ -5785,7 +5785,7 @@ const InteractiveDemographicMap = memo(() => {
 // === END INTERACTIVE MAP ===
 
 const StudyView = memo(({ isPresenting, info }) => {
-  const [activeMiniTab, setActiveMiniTab] = useState("macro"); // Default to our new macro tab
+  const [activeMiniTab, setActiveMiniTab] = useState("marketAnalysis"); // Default to our new macro tab
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
@@ -5798,34 +5798,28 @@ const StudyView = memo(({ isPresenting, info }) => {
         }`}
       >
         <button
-          onClick={() => setActiveMiniTab("macro")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "macro" ? "bg-[#99B6AA] text-[#1E2F31] shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
+          onClick={() => setActiveMiniTab("marketAnalysis")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "marketAnalysis" ? "bg-[#1E2F31] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
         >
-          <Map size={16} /> Macro Environment
+          <Search size={16} /> Market Analysis
         </button>
         <button
-          onClick={() => setActiveMiniTab("marketGap")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "marketGap" ? "bg-[#9B8B70] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
+          onClick={() => setActiveMiniTab("businessCase")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "businessCase" ? "bg-[#1C6048] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
         >
-          <PieChartIcon size={16} /> Market Gap
-        </button>
-        <button
-          onClick={() => setActiveMiniTab("marketStudy")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "marketStudy" ? "bg-[#1E2F31] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
-        >
-          <Search size={16} /> Market Study
-        </button>
-        <button
-          onClick={() => setActiveMiniTab("opportunities")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-xs font-bold transition-all whitespace-nowrap ${activeMiniTab === "opportunities" ? "bg-[#1C6048] text-white shadow-md" : "text-[#4C4A4B] hover:text-[#1E2F31] hover:bg-[#EFEBE7]/50"}`}
-        >
-          <Target size={16} /> Opportunities
+          <Target size={16} /> Business Case
         </button>
       </div>
 
       {/* Dynamic Content Rendering */}
-      {activeMiniTab === "macro" && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in fade-in zoom-in-95 duration-300">
+      {activeMiniTab === "businessCase" && (
+        <div className="space-y-10 animate-in fade-in zoom-in-95 duration-300">
+          <div>
+            <div className="border-b border-[#D8D8D8] pb-4 mb-6">
+              <h2 className="text-2xl font-black text-[#1E2F31] tracking-tight">Funnel Validation</h2>
+              <p className="text-[12px] text-[#4C4A4B] font-medium mt-1">Waitlist capture strategy and high-margin premium catchment sizing.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Radiation Queues & Waitlist Capture (Replaced Travel-Time Moat) */}
           <BentoBox
             colSpan="md:col-span-12 lg:col-span-7"
@@ -6052,10 +6046,18 @@ const StudyView = memo(({ isPresenting, info }) => {
             </div>
           </BentoBox>
         </div>
+        </div>
+        </div>
       )}
 
-      {activeMiniTab === "marketGap" && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in fade-in zoom-in-95 duration-300">
+      {activeMiniTab === "marketAnalysis" && (
+        <div className="space-y-10 animate-in fade-in zoom-in-95 duration-300">
+          <div>
+            <div className="border-b border-[#D8D8D8] pb-4 mb-6">
+              <h2 className="text-2xl font-black text-[#1E2F31] tracking-tight">Market Gap & Deficits</h2>
+              <p className="text-[12px] text-[#4C4A4B] font-medium mt-1">Systemic frictions across inpatient beds, physician ratios, and technological mismatch.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Supply & Demand Bento (Rebuilt to match slide ratio) */}
           <BentoBox colSpan="md:col-span-12">
             <div className="flex flex-col md:flex-row items-center gap-8">
@@ -6246,10 +6248,16 @@ const StudyView = memo(({ isPresenting, info }) => {
             </p>
           </BentoBox>
         </div>
-      )}
 
-      {activeMiniTab === "marketStudy" && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in fade-in zoom-in-95 duration-300">
+          </div>
+
+        {/* Section 2: Market Study */}
+        <div>
+          <div className="border-b border-[#D8D8D8] pb-4 mb-6">
+            <h2 className="text-2xl font-black text-[#1E2F31] tracking-tight">Demographics & Coverage</h2>
+            <p className="text-[12px] text-[#4C4A4B] font-medium mt-1">National health insurance distribution and specialized oncology provider tiers.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Target Demographics Bento */}
           <BentoBox
             colSpan="md:col-span-4"
@@ -7073,10 +7081,12 @@ const StudyView = memo(({ isPresenting, info }) => {
             </div>
           </BentoBox>
         </div>
+        </div>
+        </div>
       )}
 
-      {activeMiniTab === "opportunities" && (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D8D8D8] p-8 lg:p-12 animate-in fade-in zoom-in-95 duration-300">
+      {activeMiniTab === "businessCase" && (
+        <div className="bg-white rounded-2xl shadow-sm border border-[#D8D8D8] p-8 lg:p-12 animate-in fade-in zoom-in-95 duration-300 mt-6">
           {/* Slide Header */}
           <div className="mb-12 border-b border-[#D8D8D8] pb-8">
             <h2 className="text-3xl lg:text-4xl font-black text-[#4C4A4B] tracking-tight uppercase leading-tight">
