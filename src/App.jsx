@@ -4150,6 +4150,7 @@ const InteractiveDemographicMap = memo(() => {
   const poiLayersRef = useRef({});
   const poiMarkersRef = useRef({});
   const isHoveringPoi = useRef(false);
+  const activeClickedPoiRef = useRef(null);
   const measureStateRef = useRef({
     points: [],
     line: null,
@@ -4217,6 +4218,14 @@ const InteractiveDemographicMap = memo(() => {
       offset: [0, -10],
     });
     poiGroupRef.current = L.layerGroup().addTo(map);
+
+    map.on('click', () => {
+      if (activeClickedPoiRef.current) {
+        const prevId = activeClickedPoiRef.current;
+        activeClickedPoiRef.current = null;
+        handlePoiHover(prevId, false);
+      }
+    });
 
     mapRef.current = map;
     initPOIs(map);
@@ -4593,27 +4602,49 @@ const InteractiveDemographicMap = memo(() => {
     if (!L) return;
     flyToWithOffset(L.latLngBounds([lat, lon], [lat, lon]), true);
     if (id) {
+      if (activeClickedPoiRef.current && activeClickedPoiRef.current !== id) {
+        const prevId = activeClickedPoiRef.current;
+        activeClickedPoiRef.current = id;
+        handlePoiHover(prevId, false);
+      } else {
+        activeClickedPoiRef.current = id;
+      }
       handlePoiHover(id, true);
-      setTimeout(() => handlePoiHover(id, false), 2000);
     }
   };
   const handlePoiHover = useCallback((id, isHovering) => {
+    if (isHovering && activeClickedPoiRef.current && activeClickedPoiRef.current !== id) {
+      const prevId = activeClickedPoiRef.current;
+      activeClickedPoiRef.current = null;
+      const prevLayer = poiLayersRef.current[prevId];
+      if (prevLayer) {
+        prevLayer.eachLayer((layer) => {
+          if (layer.options && layer.options.pane === "markersPane") {
+            layer.setStyle({ className: "" });
+            const el = typeof layer.getElement === 'function' ? layer.getElement() : null;
+            if (el) el.classList.remove("glowing-marker");
+          }
+        });
+      }
+    }
+
     const layerGroup = poiLayersRef.current[id];
     if (layerGroup) {
       layerGroup.eachLayer((layer) => {
         if (layer.options && layer.options.pane === "markersPane") {
+          const isGlowing = isHovering || activeClickedPoiRef.current === id;
           layer.setStyle({
-            className: isHovering ? "glowing-marker" : "",
+            className: isGlowing ? "glowing-marker" : "",
             radius: 8,
             weight: 2,
             opacity: 1,
           });
           const el = typeof layer.getElement === 'function' ? layer.getElement() : null;
           if (el) {
-            if (isHovering) el.classList.add("glowing-marker");
+            if (isGlowing) el.classList.add("glowing-marker");
             else el.classList.remove("glowing-marker");
           }
-          if (isHovering && typeof layer.bringToFront === 'function') {
+          if (isGlowing && typeof layer.bringToFront === 'function') {
             layer.bringToFront();
           }
         }
@@ -4623,6 +4654,21 @@ const InteractiveDemographicMap = memo(() => {
 
   const handleGroupHover = useCallback((locs, isHovering) => {
     locs.forEach(loc => handlePoiHover(loc.id, isHovering));
+  }, [handlePoiHover]);
+
+  useEffect(() => {
+    const handleDocumentClick = (e) => {
+      // If we clicked something that is not a location list item and is not on the map itself
+      if (!e.target.closest('.location-list-item') && !e.target.closest('#demographics-map')) {
+        if (activeClickedPoiRef.current) {
+          const prevId = activeClickedPoiRef.current;
+          activeClickedPoiRef.current = null;
+          handlePoiHover(prevId, false);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleDocumentClick);
+    return () => document.removeEventListener('mousedown', handleDocumentClick);
   }, [handlePoiHover]);
 
   useEffect(() => {
@@ -4871,8 +4917,8 @@ const InteractiveDemographicMap = memo(() => {
                 }
                 
                 @keyframes pulseGlow {
-                    0% { filter: drop-shadow(0 0 4px rgba(28, 96, 72, 0.6)); fill-opacity: 0.5; }
-                    100% { filter: drop-shadow(0 0 16px rgba(28, 96, 72, 1)); fill-opacity: 1; stroke-width: 4px; }
+                    0% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)); fill-opacity: 0.8; }
+                    100% { filter: drop-shadow(0 0 24px rgba(255, 255, 255, 1)); fill-opacity: 1; stroke-width: 5px; }
                 }
                 
                 /* Glowing Marker on Hover */
@@ -5277,7 +5323,7 @@ const InteractiveDemographicMap = memo(() => {
                             .map((loc, index) => (
                               <div
                                 key={loc.id}
-                                className="flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors"
+                                className="location-list-item flex justify-between items-center py-1.5 pl-7 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors"
                                 onClick={() =>
                                   handlePoiClick(
                                     loc.lat !== undefined
@@ -5529,7 +5575,7 @@ const InteractiveDemographicMap = memo(() => {
                                         .map((loc, index) => (
                                           <div
                                             key={loc.id}
-                                            className={`flex justify-between items-center py-1.5 ${isDistanceFolder ? "pl-12" : "pl-10"} pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors`}
+                                            className={`location-list-item flex justify-between items-center py-1.5 ${isDistanceFolder ? "pl-12" : "pl-10"} pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors`}
                                             onClick={() =>
                                               handlePoiClick(loc.lat, loc.lon, loc.id)
                                             }
@@ -5654,7 +5700,7 @@ const InteractiveDemographicMap = memo(() => {
                                         .map((loc, index) => (
                                           <div
                                             key={loc.id}
-                                            className="flex justify-between items-center py-1.5 pl-12 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors"
+                                            className="location-list-item flex justify-between items-center py-1.5 pl-12 pr-2 text-[10px] font-medium hover:bg-[#EFEBE7] rounded cursor-pointer transition-colors"
                                             onClick={() =>
                                               handlePoiClick(loc.lat, loc.lon, loc.id)
                                             }
