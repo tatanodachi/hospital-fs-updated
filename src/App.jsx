@@ -8585,16 +8585,12 @@ const PropCoDashboardView = memo(
                   <ExpandableCapexRow
                     icon={<Building2 size={16} className="text-[#1E2F31]" />}
                     title="Hard Costs"
-                    amount={data.capexDetails.totalHardCosts}
+                    amount={data.capexDetails.buildCost + data.capexDetails.infraCost + data.capexDetails.ffeCost}
                     totalCapex={data.metrics.totalCapex}
                     details={[
                       {
                         label: "Construction",
                         amount: data.capexDetails.buildCost,
-                      },
-                      {
-                        label: "Medical Equipment",
-                        amount: data.capexDetails.medEqCost,
                       },
                       {
                         label: "Infrastructure",
@@ -8603,6 +8599,14 @@ const PropCoDashboardView = memo(
                       { label: "FF&E", amount: data.capexDetails.ffeCost },
                     ].filter((d) => d.amount > 0)}
                   />
+                  {data.capexDetails.medEqCost > 0 && (
+                    <ExpandableCapexRow
+                      icon={<Activity size={16} className="text-[#1C6048]" />}
+                      title="Medical Equipment"
+                      amount={data.capexDetails.medEqCost}
+                      totalCapex={data.metrics.totalCapex}
+                    />
+                  )}
                   <ExpandableCapexRow
                     icon={<Briefcase size={16} className="text-[#99B6AA]" />}
                     title="Soft Costs"
@@ -10464,6 +10468,74 @@ const PropCoSettingsView = memo(
               </>
             )}
           </div>
+          
+          {/* NEW EQUIPMENT LIST TABLE COLUMN */}
+          <div className="space-y-4 lg:col-span-2">
+            <SectionTitle
+              title="Medical Equipment Breakdown"
+              icon={<Activity size={16} />}
+              color="indigo"
+            />
+            <div className="bg-[#F9F8F6] border border-[#D8D8D8] rounded-xl overflow-hidden shadow-sm">
+              <table className="w-full text-left text-[10px]">
+                <thead className="bg-[#EFEBE7] border-b border-[#D8D8D8]">
+                  <tr>
+                    <th className="px-3 py-2 font-bold text-[#1E2F31]">Category / Item</th>
+                    <th className="px-3 py-2 font-bold text-[#1E2F31] text-center">Qty</th>
+                    <th className="px-3 py-2 font-bold text-[#1E2F31] text-right">Est. Unit (B)</th>
+                    <th className="px-3 py-2 font-bold text-[#1E2F31] text-right">Total (B)</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white">
+                  {assumptions.includeMedEq && assumptions.medEqProcurement !== "lease" ? (
+                    <>
+                      <tr className="border-b border-[#EFEBE7] hover:bg-[#F9F8F6]">
+                        <td className="px-3 py-2 font-bold text-[#4C4A4B]">Advanced Imaging (MRI & CT Scanners)</td>
+                        <td className="px-3 py-2 text-center text-[#4C4A4B]">2</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">20.0</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">40.0</td>
+                      </tr>
+                      <tr className="border-b border-[#EFEBE7] hover:bg-[#F9F8F6]">
+                        <td className="px-3 py-2 font-bold text-[#4C4A4B]">Cath Lab & Angiography Systems</td>
+                        <td className="px-3 py-2 text-center text-[#4C4A4B]">1</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">25.0</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">25.0</td>
+                      </tr>
+                      <tr className="border-b border-[#EFEBE7] hover:bg-[#F9F8F6]">
+                        <td className="px-3 py-2 font-bold text-[#4C4A4B]">Operating Room (OR) Subsystems</td>
+                        <td className="px-3 py-2 text-center text-[#4C4A4B]">8</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">5.0</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">40.0</td>
+                      </tr>
+                      <tr className="border-b border-[#EFEBE7] hover:bg-[#F9F8F6]">
+                        <td className="px-3 py-2 font-bold text-[#4C4A4B]">Radiology (X-Ray / USG / Mammo)</td>
+                        <td className="px-3 py-2 text-center text-[#4C4A4B]">10</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">1.5</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">15.0</td>
+                      </tr>
+                      <tr className="border-b border-[#EFEBE7] hover:bg-[#F9F8F6]">
+                        <td className="px-3 py-2 font-bold text-[#4C4A4B]">Specialized Procurement & Contingency</td>
+                        <td className="px-3 py-2 text-center text-[#4C4A4B]">-</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">-</td>
+                        <td className="px-3 py-2 text-right text-[#4C4A4B]">30.0</td>
+                      </tr>
+                      <tr className="bg-[#EFEBE7]/50 font-black">
+                        <td className="px-3 py-3 text-[#1C6048] uppercase tracking-widest text-xs" colSpan={3}>Total Medical Equipment Budget</td>
+                        <td className="px-3 py-3 text-right text-[#1C6048] text-xs">{(assumptions.capexMedEqQty * assumptions.capexMedEqPrice / 1000).toFixed(1)}</td>
+                      </tr>
+                    </>
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-3 py-6 text-center text-[#9B8B70] italic">
+                        {assumptions.includeMedEq ? "Equipment procured via lease (OpCo expense). Not capitalized." : "Medical Equipment is excluded in current assumptions."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
         </div>
       </div>
     );
