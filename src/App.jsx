@@ -118,6 +118,10 @@ const LEGEND_STYLE = { fontSize: "11px", paddingTop: "20px" };
 
 // --- NEW STABLE REFERENCES FOR OPPORTUNITIES TAB ---
 const TICK_STYLE = { fontSize: 10, fill: "#4C4A4B" };
+const PREM_MKT_PIE_DATA = [
+  { name: "SES A & B", value: 18 },
+  { name: "General / BPJS", value: 82 },
+];
 const formatCancerCases = (val) => new Intl.NumberFormat("en-US").format(val);
 const formatInsuranceTooltip = (val) => val.toFixed(2) + "T IDR";
 const formatInsuranceLabel = (val) => val.toFixed(2);
@@ -6125,6 +6129,13 @@ const InteractiveDemographicMap = memo(() => {
 const ClinicalProgrammingView = memo(() => {
   const [viewMode, setViewMode] = useState<'moh' | 'private'>('moh');
 
+  const pieData = useMemo(() => [
+    { name: 'Standard', value: 48, color: viewMode === 'private' ? '#4C4A4B' : '#9B8B70' },
+    { name: 'VIP/VVIP', value: 48, color: viewMode === 'private' ? '#9B8B70' : '#99B6AA' },
+    { name: 'Isolation', value: 12, color: viewMode === 'private' ? '#D8D8D8' : '#FFFFFF' },
+    { name: 'ICU', value: 12, color: viewMode === 'private' ? '#1C6048' : '#48B084' },
+  ], [viewMode]);
+
   return (
     <div className="space-y-10 animate-in fade-in zoom-in-95 duration-300">
       <div>
@@ -6227,12 +6238,7 @@ const ClinicalProgrammingView = memo(() => {
                   <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
                     <PieChart className="outline-none focus:outline-none" style={{ outline: 'none' }}>
                       <Pie
-                        data={[
-                          { name: 'Standard', value: 48, color: viewMode === 'private' ? '#4C4A4B' : '#9B8B70' },
-                          { name: 'VIP/VVIP', value: 48, color: viewMode === 'private' ? '#9B8B70' : '#99B6AA' },
-                          { name: 'Isolation', value: 12, color: viewMode === 'private' ? '#D8D8D8' : '#FFFFFF' },
-                          { name: 'ICU', value: 12, color: viewMode === 'private' ? '#1C6048' : '#48B084' },
-                        ]}
+                        data={pieData}
                         cx="50%"
                         cy="50%"
                         innerRadius={40}
@@ -6243,12 +6249,7 @@ const ClinicalProgrammingView = memo(() => {
                         isAnimationActive={false}
                         className="outline-none focus:outline-none"
                       >
-                        {[
-                          { name: 'Standard', value: 48, color: viewMode === 'private' ? '#4C4A4B' : '#9B8B70' },
-                          { name: 'VIP/VVIP', value: 48, color: viewMode === 'private' ? '#9B8B70' : '#99B6AA' },
-                          { name: 'Isolation', value: 12, color: viewMode === 'private' ? '#D8D8D8' : '#FFFFFF' },
-                          { name: 'ICU', value: 12, color: viewMode === 'private' ? '#1C6048' : '#48B084' },
-                        ].map((entry, index) => (
+                        {pieData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} className="outline-none focus:outline-none transition-colors duration-500" />
                         ))}
                       </Pie>
@@ -6846,10 +6847,7 @@ const StudyView = memo(({ isPresenting, info }) => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart style={{ outline: 'none' }}>
                     <Pie
-                      data={[
-                        { name: "SES A & B", value: 18 },
-                        { name: "General / BPJS", value: 82 },
-                      ]}
+                      data={PREM_MKT_PIE_DATA}
                       cx="50%"
                       cy="50%"
                       startAngle={90}
@@ -8400,6 +8398,11 @@ const PropCoDashboardView = memo(
     setTab,
     isPresenting,
   }) => {
+    const pieData = useMemo(() => [
+      { name: "Equity", value: data.metrics.totalEquity },
+      { name: "Bank Loan", value: data.metrics.totalDebt },
+    ], [data.metrics.totalEquity, data.metrics.totalDebt]);
+
     const [chartMode, setChartMode] = useState("full");
     const chartData =
       chartMode === "full" ? data.annualData : data.operatingData;
@@ -8521,10 +8524,7 @@ const PropCoDashboardView = memo(
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart style={{ outline: 'none' }}>
                       <Pie
-                        data={[
-                          { name: "Equity", value: data.metrics.totalEquity },
-                          { name: "Bank Loan", value: data.metrics.totalDebt },
-                        ]}
+                        data={pieData}
                         cx="50%"
                         cy="50%"
                         innerRadius={40}
@@ -8534,7 +8534,7 @@ const PropCoDashboardView = memo(
                         className="outline-none focus:outline-none"
                         stroke="none"
                       >
-                        {[0, 1].map((entry, index) => (
+                        {pieData.map((entry, index) => (
                           <Cell
                             key={`cell-src-${index}`}
                             fill={index === 0 ? "#1C6048" : "#D8D8D8"}
@@ -10487,7 +10487,7 @@ const PropCoSettingsView = memo(
                   </tr>
                 </thead>
                 <tbody className="bg-white">
-                  {assumptions.includeMedEq && assumptions.medEqProcurement !== "lease" ? (
+                  {assumptions.includeMedEq ? (
                     <>
                       <tr className="border-b border-[#EFEBE7] hover:bg-[#F9F8F6]">
                         <td className="px-3 py-2 font-bold text-[#4C4A4B]">Advanced Imaging (MRI & CT Scanners)</td>
@@ -10519,15 +10519,24 @@ const PropCoSettingsView = memo(
                         <td className="px-3 py-2 text-right text-[#4C4A4B]">-</td>
                         <td className="px-3 py-2 text-right text-[#4C4A4B]">30.0</td>
                       </tr>
-                      <tr className="bg-[#EFEBE7]/50 font-black">
-                        <td className="px-3 py-3 text-[#1C6048] uppercase tracking-widest text-xs" colSpan={3}>Total Medical Equipment Budget</td>
+                      <tr className="bg-[#EFEBE7]/50 font-black relative group">
+                        <td className="px-3 py-3 text-[#1C6048] uppercase tracking-widest text-xs" colSpan={3}>
+                          <div className="flex items-center gap-2">
+                            Total Medical Equipment Budget
+                            {assumptions.medEqProcurement === "lease" && (
+                              <span className="px-2 py-0.5 bg-[#9B8B70] text-white text-[9px] rounded-full uppercase tracking-wider">
+                                Leased (Informational)
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         <td className="px-3 py-3 text-right text-[#1C6048] text-xs">{(assumptions.capexMedEqQty * assumptions.capexMedEqPrice / 1000).toFixed(1)}</td>
                       </tr>
                     </>
                   ) : (
                     <tr>
                       <td colSpan={4} className="px-3 py-6 text-center text-[#9B8B70] italic">
-                        {assumptions.includeMedEq ? "Equipment procured via lease (OpCo expense). Not capitalized." : "Medical Equipment is excluded in current assumptions."}
+                        Medical Equipment is excluded in current assumptions.
                       </td>
                     </tr>
                   )}
