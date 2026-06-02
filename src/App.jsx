@@ -6234,27 +6234,9 @@ const ClinicalProgrammingView = memo(() => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 px-4 lg:px-8">
               {/* Chart Column (Span 3) */}
               <div className="lg:col-span-3 flex flex-col justify-center items-center lg:border-r border-white/20 pb-6 lg:pb-0 lg:pr-6 border-b lg:border-b-0">
-                <div className="h-40 w-full relative flex items-center justify-center">
-                    <PieChart width={160} height={160}>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={75}
-                        paddingAngle={3}
-                        dataKey="value"
-                        stroke="none"
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <div className="h-40 w-full relative bg-[#1C6048]/10 rounded-2xl flex flex-col items-center justify-center border border-white/20">
                     <span className="text-2xl font-black text-white">120</span>
                     <span className="text-[10px] font-bold text-white/60 -mt-1 uppercase tracking-widest">Beds</span>
-                  </div>
                 </div>
               </div>
 
@@ -7664,7 +7646,6 @@ const StudyView = memo(({ isPresenting, info }) => {
                       dy={10}
                     />
                     <Tooltip allowEscapeViewBox={{ x: true, y: true }}
-                      cursor={CHART_CURSOR_STYLE}
                       contentStyle={TOOLTIP_STYLE}
                       formatter={formatCancerCases}
                     />
