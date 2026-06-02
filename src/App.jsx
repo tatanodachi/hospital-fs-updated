@@ -6233,10 +6233,10 @@ const ClinicalProgrammingView = memo(() => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 px-4 lg:px-8">
               {/* Chart Column (Span 3) */}
-              <div className="lg:col-span-3 flex flex-col justify-center items-center lg:border-r border-white/20 pb-6 lg:pb-0 lg:pr-6 border-b lg:border-b-0 outline-none focus:outline-none">
-                <div className="h-40 w-full relative outline-none focus:outline-none" style={{ outline: 'none' }}>
-                  <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
-                    <PieChart className="outline-none focus:outline-none" style={{ outline: 'none' }}>
+              <div className="lg:col-span-3 flex flex-col justify-center items-center lg:border-r border-white/20 pb-6 lg:pb-0 lg:pr-6 border-b lg:border-b-0">
+                <div className="h-40 w-full relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
                       <Pie
                         data={pieData}
                         cx="50%"
@@ -6247,18 +6247,15 @@ const ClinicalProgrammingView = memo(() => {
                         dataKey="value"
                         stroke="none"
                         isAnimationActive={false}
-                        className="outline-none focus:outline-none"
                       >
                         {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} className="outline-none focus:outline-none transition-colors duration-500" />
+                          <Cell key={`cell-${index}`} fill={entry.color} className="transition-colors duration-500" />
                         ))}
                       </Pie>
                       <Tooltip 
-                        allowEscapeViewBox={{ x: true, y: true }}
                         formatter={(value, name) => [`${value} beds`, name]}
-                        contentStyle={{ backgroundColor: '#1E2F31', borderColor: '#4C4A4B', fontSize: '10px', color: '#fff', borderRadius: '8px', zIndex: 50, outline: 'none' }}
+                        contentStyle={{ backgroundColor: '#1E2F31', borderColor: '#4C4A4B', fontSize: '10px', color: '#fff', borderRadius: '8px', zIndex: 50 }}
                         itemStyle={{ color: '#fff' }}
-                        cursor={{ fill: 'transparent' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
