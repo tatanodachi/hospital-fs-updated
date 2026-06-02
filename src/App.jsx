@@ -2126,18 +2126,38 @@ const NavButton = memo(({ active, onClick, icon, label, disabled }) => (
   </button>
 ));
 
-const KPICard = memo(({ title, value, icon, color, subtitle }) => {
+const KPICard = memo(({ title, value, icon, color, subtitle, tooltip }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
   const textColors = {
     blue: "text-[#1C6048]",
     emerald: "text-[#1E2F31]",
     indigo: "text-[#9B8B70]",
   };
   return (
-    <div className="p-4 lg:p-5 rounded-2xl border border-[#D8D8D8] bg-white flex flex-col shadow-sm transition-transform hover:-translate-y-1">
+    <div 
+      className={`p-4 lg:p-5 rounded-2xl border border-[#D8D8D8] bg-white flex flex-col shadow-sm transition-transform hover:-translate-y-1 relative ${showTooltip ? 'z-50' : 'z-10'}`}
+      onMouseEnter={() => tooltip && setShowTooltip(true)}
+      onMouseLeave={() => tooltip && setShowTooltip(false)}
+    >
       <div
-        className={`flex items-center gap-2 mb-2 opacity-80 text-[9px] lg:text-[10px] font-black uppercase tracking-widest ${textColors[color] || "text-[#1E2F31]"}`}
+        className={`flex items-center justify-between mb-2 opacity-80 text-[9px] lg:text-[10px] font-black uppercase tracking-widest ${textColors[color] || "text-[#1E2F31]"}`}
       >
-        {icon} {title}
+        <div className="flex items-center gap-1.5">
+          {icon} {title}
+        </div>
+        {tooltip && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowTooltip(!showTooltip);
+            }}
+            className="text-[#4C4A4B]/60 hover:text-[#1C6048] transition-colors focus:outline-none p-0.5"
+            aria-label="More information"
+          >
+            <Info size={11} strokeWidth={2.5} />
+          </button>
+        )}
       </div>
       <div
         className={`text-lg lg:text-xl font-black mb-1 ${textColors[color] || "text-[#1E2F31]"}`}
@@ -2147,6 +2167,24 @@ const KPICard = memo(({ title, value, icon, color, subtitle }) => {
       <div className="text-[8px] lg:text-[9px] font-bold uppercase text-[#4C4A4B] opacity-60 tracking-tighter">
         {subtitle}
       </div>
+
+      {tooltip && showTooltip && (
+        <div 
+          className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[260px] p-3.5 bg-[#121E20]/85 backdrop-blur-md text-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.3)] border border-white/15 z-[100] text-xs font-medium leading-relaxed normal-case tracking-normal animate-in fade-in slide-in-from-bottom-2 duration-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="font-bold text-white mb-2 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[#99B6AA]">
+            <Info size={12} className="text-[#99B6AA]" /> Metric Insight
+          </div>
+          <p className="text-white/90 text-[11px] leading-relaxed mb-3">{tooltip.desc}</p>
+          {tooltip.formula && (
+            <div className="bg-black/20 p-2 rounded-lg border border-white/10 font-mono text-[9px] text-[#48B084]">
+              <span className="text-white/40 block text-[8px] uppercase font-sans font-bold tracking-widest mb-1 shadow-sm">Formula</span>
+              {tooltip.formula}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 });
@@ -7791,6 +7829,10 @@ const OpCoDashboardView = memo(
             icon={<BarChart3 size={18} />}
             color="emerald"
             subtitle="Project MOIC"
+            tooltip={{
+              desc: "Indicates absolute wealth creation. While IRR measures compounding speed over time, the Cash Multiple (MOIC) shows the absolute magnitude of your cash return. A typical healthcare infrastructure target is 2.5x - 3.0x+.",
+              formula: "Total Project Free Cash Flow ÷ Cumulative Partner Equity Invested"
+            }}
           />
           <KPICard
             title="Project IRR"
@@ -7805,6 +7847,10 @@ const OpCoDashboardView = memo(
             icon={<Coins size={18} />}
             color="indigo"
             subtitle="Mean Operating Yield"
+            tooltip={{
+              desc: "The average annual cash distribution yield. It acts as the steady engine driving the overall Cash Multiple over the asset's lifecycle.",
+              formula: "Average of (Annual Cash Flow ÷ Invested Equity) across operating years"
+            }}
           />
         </div>
 
@@ -9111,6 +9157,10 @@ const ConsolidatedDashboardView = memo(
             icon={<BarChart3 size={18} />}
             color="blue"
             subtitle="Consolidated MOIC"
+            tooltip={{
+              desc: "Consolidated MOIC representing the aggregate wealth creation for the entire HoldCo. It combines both the Strategic Hospital Operator and Financial Partner cash profiles into a single unified multiple.",
+              formula: "Total HoldCo Distributions ÷ Cumulative Equity Contribution"
+            }}
           />
           <KPICard
             title="Blended Equity IRR"
